@@ -1,0 +1,56 @@
+﻿<li id="@Item.UniqueIdentifier" @onclick='ItemSelected' @onclick:stopPropagation="true">
+    @if (Item.HasChildren)
+    {
+        <span class="caret @(Item.IsExpanded?"caret-down":"")" @onclick="ToggleExpand" @onclick:stopPropagation="true"></span>
+    }
+
+    @if (Item.IsSelected)
+    {
+        <b>@Item.Label</b>
+    }
+    else
+    {
+        @Item.Label
+    }
+
+    @if (Item.HasChildren && Item.IsExpanded)
+    {
+        <ul>
+            @foreach (var child in Item.Children)
+            {
+                <EqTreeViewItem @ref="@child.eqTreeViewItem"
+                                Item="@child"
+                                KeyPropertyName="@KeyPropertyName"
+                                ValuePropertyName="@ValuePropertyName"
+                                @key="@child.UniqueIdentifier"
+                                OnItemSelected="@OnItemSelected"></EqTreeViewItem>
+            }
+        </ul>
+    }
+</li>
+
+@code {
+    [Parameter] public string KeyPropertyName { get; set; } = "Id";
+    [Parameter] public string ValuePropertyName { get; set; } = "Name";
+    [Parameter] public EqTreeItem Item { get; set; }
+    [Parameter] public EventCallback<EqTreeItem> OnItemSelected { get; set; }
+
+    protected string caretClass = "";
+    protected async Task ItemSelected(MouseEventArgs args)
+    {
+        Item.IsSelected = true;
+        await OnItemSelected.InvokeAsync(Item);
+    }
+
+    protected void ToggleExpand(MouseEventArgs args)
+    {
+        Item.IsExpanded = !Item.IsExpanded;
+    }
+
+    public void Refresh()
+    {
+        this.StateHasChanged();
+        Console.WriteLine($"Refreshed {Item.Label}");
+    }
+}
+ 

@@ -1,0 +1,49 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.31112.23
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "equiavia.components.Server", "Server\equiavia.components.Server.csproj", "{12566DCA-FD0D-4AC3-B1ED-23661C6D9FA3}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "equiavia.components.Client", "Client\equiavia.components.Client.csproj", "{5817B827-878D-4AB4-AE53-BDA168D16A21}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "equiavia.components.Shared", "Shared\equiavia.components.Shared.csproj", "{1576EE87-3290-46B4-9DB6-D8308A22BF86}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "equiavia.components.Utilities", "equiavia.components.Utilities\equiavia.components.Utilities.csproj", "{C3C91FB2-7D2E-4708-AC1C-5374A05946B3}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "equiavia.components.Library", "Library\equiavia.components.Library.csproj", "{056F0767-7EE8-4DDC-9CE0-567D0EEFE23D}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{12566DCA-FD0D-4AC3-B1ED-23661C6D9FA3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{12566DCA-FD0D-4AC3-B1ED-23661C6D9FA3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{12566DCA-FD0D-4AC3-B1ED-23661C6D9FA3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{12566DCA-FD0D-4AC3-B1ED-23661C6D9FA3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5817B827-878D-4AB4-AE53-BDA168D16A21}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5817B827-878D-4AB4-AE53-BDA168D16A21}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5817B827-878D-4AB4-AE53-BDA168D16A21}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5817B827-878D-4AB4-AE53-BDA168D16A21}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1576EE87-3290-46B4-9DB6-D8308A22BF86}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1576EE87-3290-46B4-9DB6-D8308A22BF86}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1576EE87-3290-46B4-9DB6-D8308A22BF86}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1576EE87-3290-46B4-9DB6-D8308A22BF86}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C3C91FB2-7D2E-4708-AC1C-5374A05946B3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C3C91FB2-7D2E-4708-AC1C-5374A05946B3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C3C91FB2-7D2E-4708-AC1C-5374A05946B3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C3C91FB2-7D2E-4708-AC1C-5374A05946B3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{056F0767-7EE8-4DDC-9CE0-567D0EEFE23D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{056F0767-7EE8-4DDC-9CE0-567D0EEFE23D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{056F0767-7EE8-4DDC-9CE0-567D0EEFE23D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{056F0767-7EE8-4DDC-9CE0-567D0EEFE23D}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {69BF2E0E-8553-4502-BBAA-CFB98FCCA943}
+	EndGlobalSection
+EndGlobal

@@ -1,0 +1,21 @@
+﻿@typeparam TValue
+@using equiavia.components.Utilities
+
+@if (_treeItems != null)
+{
+    <ul class="noselect">
+        @foreach (var item in _treeItems.Where(i => i.IsRootNode).ToList())
+        {
+            <EqTreeViewItem @ref="@item.eqTreeViewItem"
+                            Item="@item"
+                            KeyPropertyName="@KeyPropertyName"
+                            ValuePropertyName="@ValuePropertyName"
+                            @key="item.UniqueIdentifier"
+                            OnItemSelected="ItemSelected"></EqTreeViewItem>
+        }
+    </ul>
+}
+
+@code {
+  
+}
