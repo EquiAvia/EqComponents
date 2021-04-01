@@ -16,6 +16,7 @@ namespace equiavia.components.Library.TreeView
         [Parameter] public string ParentKeyPropertyName { get; set; } = "ParentId";
         [Parameter] public EventCallback<TValue> OnItemSelected { get; set; }
         [Parameter] public EventCallback<IEnumerable<TValue>> OnItemsRemoved { get; set; }
+        [Parameter] public string Height { get; set; } = "100px";
         [Inject]
         public TreeViewJSInterop js { get; set; }
         public TValue SelectedItem
@@ -105,14 +106,14 @@ namespace equiavia.components.Library.TreeView
             var treeItem = FindTreeItem(item);
             SetSelectedTreeItem(treeItem);
             ShowTreeItem(treeItem);
-            js.ScrollToElement(treeItem.UniqueIdentifier.ToString());
+            js.ScrollToElement($"EQ-{treeItem.UniqueIdentifier.ToString()}");
         }
 
         public void ShowItem(TValue item)
         {
             var treeItem = FindTreeItem(item);
             ShowTreeItem(treeItem);
-            js.ScrollToElement(treeItem.UniqueIdentifier.ToString());
+            js.ScrollToElement($"EQ-{treeItem.UniqueIdentifier.ToString()}");
         }
 
         public void ExpandAll()

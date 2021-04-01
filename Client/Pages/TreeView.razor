@@ -5,9 +5,30 @@
 @inject HttpClient Http
 
 <h1>Tree View </h1>
-<div style="width:50%;height:250px;overflow-y:scroll">
-    <EqTreeView @ref="treeView" TValue="Employee" Datasource="employees" ValuePropertyName="Name" OnItemsRemoved="ItemsRemoved"></EqTreeView>
+<div class="row">
+    <div class="col">
+        <EqTreeView @ref="treeView" TValue="Employee" Datasource="employees" ValuePropertyName="Name" OnItemsRemoved="ItemsRemoved"></EqTreeView>
+    </div>
+    <div class="col">
+        <h4>
+            Current Content of the Datasource
+        </h4>
+        <ul>
+            @if (employees != null)
+            {
+                @foreach (var item in employees)
+                {
+                    <li>@item.Id - @item.Name - @item.ParentId</li>
+                }
+            }
+            else
+            {
+                <li>None</li>
+            }
+        </ul>
+    </div>
 </div>
+
 
 <div class="row">
     <div class="col">
@@ -55,26 +76,15 @@
         <button @onclick="Refresh">
             Refresh the TreeView
         </button>
+        @if (treeView != null)
+        {
+            <EditForm Model="@treeView">
+                Tree View Height
+                <InputText @bind-Value="@treeView.Height"></InputText>
+            </EditForm>
+        }
     </div>
 </div>
-<hr />
-<h4>
-    Current Content of the Datasource
-</h4>
-<ul>
-
-    @if (employees != null)
-    {
-        @foreach (var item in employees)
-        {
-            <li>@item.Id - @item.Name - @item.ParentId</li>
-        }
-    }
-    else
-    {
-        <li>None</li>
-    }
-</ul>
 <hr />
 <h4>
     Removed Employees

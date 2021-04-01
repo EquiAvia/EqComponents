@@ -3,6 +3,7 @@
 
 @if (_treeItems != null)
 {
+<div class="treeview-container" style="max-height:@Height;">
     <ul class="noselect">
         @foreach (var item in _treeItems.Where(i => i.IsRootNode).ToList())
         {
@@ -14,6 +15,8 @@
                             OnItemSelected="ItemSelected"></EqTreeViewItem>
         }
     </ul>
+</div>
+
 }
 
 @code {

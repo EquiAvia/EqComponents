@@ -18,7 +18,7 @@ namespace equiavia.components.Library
         public TreeViewJSInterop(IJSRuntime jsRuntime)
         {
             moduleTask = new(() => jsRuntime.InvokeAsync<IJSObjectReference>(
-               "import", "./_content/Library/TreeViewJsInterop.js").AsTask());
+               "import", "./_content/equiavia.components.Library/TreeViewJsInterop.js").AsTask());
         }
 
         public async Task<bool> ScrollToElement(string elementid)

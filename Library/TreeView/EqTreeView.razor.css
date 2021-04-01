@@ -11,3 +11,7 @@ ul {
     list-style-type: none;
 }
 
+.treeview-container {
+    overflow-y: auto;
+    border-width: thin;
+}

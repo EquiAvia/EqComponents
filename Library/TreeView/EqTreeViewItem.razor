@@ -1,4 +1,4 @@
-﻿<li id="@Item.UniqueIdentifier" @onclick='ItemSelected' @onclick:stopPropagation="true">
+﻿<li id="EQ-@Item.UniqueIdentifier" @onclick='ItemSelected' @onclick:stopPropagation="true">
     @if (Item.HasChildren)
     {
         <span class="caret @(Item.IsExpanded?"caret-down":"")" @onclick="ToggleExpand" @onclick:stopPropagation="true"></span>
