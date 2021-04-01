@@ -41,18 +41,21 @@
         <button @onclick="AddChildItem">
             Add a CIO to CEO
         </button>
+        <hr />
         <button @onclick="UpdateChildItem">
             Update text of the selected Item
+        </button>        
+        <button @onclick="MoveChildItem">
+            Move the Accountant to the Director
         </button>
+        <hr />
         <button @onclick="RemoveItem">
             Remove the CEO
         </button>
         <button @onclick="RemoveSelectedItem">
             Remove the Selected Item
         </button>
-        <button @onclick="MoveChildItem">
-            Move the Accountant to the Director
-        </button>
+
     </div>
     <div class="col">
         <h4>Tree Controls</h4>
@@ -62,6 +65,7 @@
         <button @onclick="CollapseAll">
             Collapse All
         </button>
+        <hr/>
         <button @onclick="SetSelectedItem">
             Select the Accountant
         </button>
@@ -76,6 +80,7 @@
         <button @onclick="Refresh">
             Refresh the TreeView
         </button>
+        <hr />
         @if (treeView != null)
         {
             <EditForm Model="@treeView">
