@@ -84,8 +84,12 @@
         @if (treeView != null)
         {
             <EditForm Model="@treeView">
+
                 Tree View Height
                 <InputText @bind-Value="@treeView.Height"></InputText>
+
+                Filter
+                <input @onchange="SearchTermChanged"/>
             </EditForm>
         }
     </div>
@@ -114,6 +118,7 @@
     private List<Employee> employees;
     private List<Employee> removedEmployees;
     private EqTreeView<Employee> treeView;
+    private string SearchTerm;
 
     protected override async Task OnInitializedAsync()
     {
@@ -139,6 +144,11 @@
     {
         var accountant = employees.FirstOrDefault(e => e.Name.Equals("Accountant"));
         treeView.SetSelectedItem(accountant);
+    }
+
+    protected void SearchTermChanged(ChangeEventArgs args)
+    {
+        treeView.Filter(args.Value.ToString());
     }
 
     protected void ShowItem()

@@ -9,6 +9,7 @@ namespace equiavia.components.Library.TreeView
         public string ParentKey { get; set; }
         public string Label { get; set; }
         public bool IsSelected { get; set; }
+        public bool IsVisible { get; set; } = true;
         public bool IsExpanded { get; set; }
         public bool IsDisabled { get; set; }
         public Guid UniqueIdentifier { get; internal set; }

@@ -52,7 +52,6 @@ namespace equiavia.components.Library.TreeView
             }
             _treeItems.Add(newItem);
         }
-
         public void Update(TValue Item)
         {
             var treeItem = FindTreeItem(Item.GetPropValue(KeyPropertyName)?.ToString());
@@ -70,7 +69,6 @@ namespace equiavia.components.Library.TreeView
             treeItem.ParentKey = Item.GetPropValue(ParentKeyPropertyName)?.ToString();
             SetTreeItemParent(treeItem,treeItem.ParentKey);
         }
-
         public async Task<bool> Remove(TValue datasourceItemToDelete)
         {
             if (datasourceItemToDelete == null)
@@ -102,7 +100,26 @@ namespace equiavia.components.Library.TreeView
             Console.WriteLine($"Successfully removed {treeItemToRemove.Label}");
             return true;
         }
-
+        public void Filter(string searchTerm)
+        {
+            var matchedItems = _treeItems.Where(i => i.Label.Contains(searchTerm)).ToList();
+            foreach(var item in _treeItems)
+            {
+                if (!matchedItems.Any(i => i.Key == item.Key))
+                {
+                    item.IsVisible = false;
+                    item.IsSelected = false;
+                }
+                else
+                {
+                    item.IsVisible = true;
+                }
+            }
+            foreach(var item in matchedItems)
+            {
+                ShowTreeItem(item);
+            }
+        }
         public void SetSelectedItem(TValue item)
         {
             var treeItem = FindTreeItem(item);
@@ -110,14 +127,12 @@ namespace equiavia.components.Library.TreeView
             ShowTreeItem(treeItem);
             js.ScrollToElement($"EQ-{treeItem.UniqueIdentifier.ToString()}");
         }
-
         public void ShowItem(TValue item)
         {
             var treeItem = FindTreeItem(item);
             ShowTreeItem(treeItem);
             js.ScrollToElement($"EQ-{treeItem.UniqueIdentifier.ToString()}");
         }
-
         public void ExpandAll()
         {
             foreach (var treeItem in _treeItems)
@@ -126,7 +141,6 @@ namespace equiavia.components.Library.TreeView
             }
             Console.WriteLine("Expand All");
         }
-
         public void CollapseAll()
         {
             foreach (var treeItem in _treeItems)
@@ -135,7 +149,6 @@ namespace equiavia.components.Library.TreeView
             }
             Console.WriteLine("Collapse All");
         }
-
         public void Refresh()
         {
             foreach (var treeItem in _treeItems)
@@ -149,7 +162,6 @@ namespace equiavia.components.Library.TreeView
                     Console.WriteLine($"TreeItem {treeItem.Label} does not have an control associated with it.");
                 }
             }
-
         }
         #endregion
         #region Helper Methods
@@ -161,6 +173,7 @@ namespace equiavia.components.Library.TreeView
             }
 
             eqTreeItem.IsExpanded = true;
+            eqTreeItem.IsVisible = true;
             ShowTreeItem(eqTreeItem.Parent);
         }
 

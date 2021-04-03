@@ -17,7 +17,7 @@
         @if (Item.HasChildren && Item.IsExpanded)
         {
             <ul>
-                @foreach (var child in Item.Children)
+                @foreach (var child in Item.Children.Where(i => i.IsVisible))
                 {
                     <EqTreeViewItem TValue=@TValue
                                     @ref="@child.eqTreeViewItem"
