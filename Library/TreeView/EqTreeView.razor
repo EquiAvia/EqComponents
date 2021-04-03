@@ -3,22 +3,24 @@
 
 @if (_treeItems != null)
 {
-<div class="treeview-container" style="max-height:@Height;">
-    <ul class="noselect">
-        @foreach (var item in _treeItems.Where(i => i.IsRootNode).ToList())
-        {
-            <EqTreeViewItem @ref="@item.eqTreeViewItem"
-                            Item="@item"
-                            KeyPropertyName="@KeyPropertyName"
-                            ValuePropertyName="@ValuePropertyName"
-                            @key="item.UniqueIdentifier"
-                            OnItemSelected="ItemSelected"></EqTreeViewItem>
-        }
-    </ul>
-</div>
-
+    <CascadingValue TValue="EqTreeView<TValue>" Value="@this">
+        <div class="treeview-container" style="max-height:@Height;">
+            <ul class="noselect">
+                @foreach (var item in _treeItems.Where(i => i.IsRootNode).ToList())
+                {
+                    <EqTreeViewItem TValue=@TValue
+                                    @ref="@item.eqTreeViewItem"
+                                    Item="@item"
+                                    KeyPropertyName="@KeyPropertyName"
+                                    ValuePropertyName="@ValuePropertyName"
+                                    @key="item.UniqueIdentifier"
+                                    OnItemSelected="ItemSelected"></EqTreeViewItem>
+                }
+            </ul>
+        </div>
+    </CascadingValue>
 }
 
 @code {
-  
+
 }

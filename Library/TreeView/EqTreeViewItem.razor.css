@@ -7,7 +7,7 @@
     /* Create the caret/arrow with a unicode, and style it */
     .caret::before {
         content: "\25B6";
-        color: black;
+        color: white;
         display: inline-block;
         margin-right: 6px;
     }
@@ -30,3 +30,19 @@ ul {
     display: block;
 }
 
+
+.item {
+    margin-bottom: 5px;
+    padding: 10px 15px;
+    border: 1px solid #000000;
+    cursor: pointer;
+    color: white;
+    background-color: #2F5170;
+    border-radius: 5px;
+    width: 300px;
+}
+
+.selected-item {
+    filter: brightness(150%);
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+}

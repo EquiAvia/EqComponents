@@ -15,7 +15,7 @@ namespace equiavia.components.Library.TreeView
         public int Level { get; internal set; } = 0;
         public List<EqTreeItem> Children { get; internal set; }
         public EqTreeItem Parent { get; internal set; }
-        public EqTreeViewItem eqTreeViewItem { get; set; }
+        public object eqTreeViewItem { get; set; }
         public bool IsRootNode
         {
             get

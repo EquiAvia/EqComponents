@@ -17,6 +17,7 @@ namespace equiavia.components.Library.TreeView
         [Parameter] public EventCallback<TValue> OnItemSelected { get; set; }
         [Parameter] public EventCallback<IEnumerable<TValue>> OnItemsRemoved { get; set; }
         [Parameter] public string Height { get; set; } = "100px";
+        public EqTreeItem DraggedItem { get; set; }
         [Inject]
         public TreeViewJSInterop js { get; set; }
         public TValue SelectedItem
@@ -28,6 +29,7 @@ namespace equiavia.components.Library.TreeView
         }
         protected List<EqTreeItem> _treeItems;
         protected EqTreeItem _selectedItem;
+
 
         #region Life Cycle Methods
         protected override Task OnParametersSetAsync()
@@ -140,7 +142,7 @@ namespace equiavia.components.Library.TreeView
             {
                 if (treeItem.eqTreeViewItem != null)
                 {
-                    treeItem.eqTreeViewItem.Refresh();
+                    (treeItem.eqTreeViewItem as EqTreeViewItem<TValue>).Refresh();
                 }
                 else
                 {
