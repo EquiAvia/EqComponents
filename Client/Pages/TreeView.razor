@@ -29,7 +29,6 @@
     </div>
 </div>
 
-
 <div class="row">
     <div class="col">
         <h4>
@@ -44,7 +43,7 @@
         <hr />
         <button @onclick="UpdateChildItem">
             Update text of the selected Item
-        </button>        
+        </button>
         <button @onclick="MoveChildItem">
             Move the Accountant to the Director
         </button>
@@ -65,7 +64,7 @@
         <button @onclick="CollapseAll">
             Collapse All
         </button>
-        <hr/>
+        <hr />
         <button @onclick="SetSelectedItem">
             Select the Accountant
         </button>
@@ -83,14 +82,26 @@
         <hr />
         @if (treeView != null)
         {
-            <EditForm Model="@treeView">
-
+    <EditForm Model="@treeView">
+        <div class="row">
+            <div class="col">
                 Tree View Height
                 <InputText @bind-Value="@treeView.Height"></InputText>
-
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
                 Filter
-                <input @onchange="SearchTermChanged"/>
-            </EditForm>
+                <input @onchange="SearchTermChanged" />
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                Compact View
+                <InputCheckbox @bind-Value="@treeView.CompactView" />
+            </div>
+        </div>
+    </EditForm>
         }
     </div>
 </div>

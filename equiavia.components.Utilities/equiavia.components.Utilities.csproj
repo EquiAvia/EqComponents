@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>net5.0</TargetFramework>
-    <Version>0.0.0.1</Version>
+    <Version>0.0.0.2</Version>
     <Company>EQUIAVIA Ltd.</Company>
     <Authors>Basil Buwalda</Authors>
     <Description>A set of extension methods for c# classes</Description>

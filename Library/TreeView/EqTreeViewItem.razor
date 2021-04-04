@@ -1,6 +1,6 @@
 ﻿@typeparam TValue
 <li id="EQ-@Item.UniqueIdentifier" @onclick='ItemSelected' @onclick:stopPropagation="true"
-    class="item @(Item.IsSelected?selectedClass:"")">
+    class="@(CompactView?"item":"") @(Item.IsSelected&&CompactView?selectedClass:"")">
     <div>
         @if (Item.HasChildren)
         {
@@ -25,7 +25,8 @@
                                     KeyPropertyName="@KeyPropertyName"
                                     ValuePropertyName="@ValuePropertyName"
                                     @key="@child.UniqueIdentifier"
-                                    OnItemSelected="@OnItemSelected"></EqTreeViewItem>
+                                    OnItemSelected="@OnItemSelected"
+                                    CompactView="@CompactView"></EqTreeViewItem>
                 }
             </ul>
         }
@@ -38,6 +39,7 @@
     [Parameter] public string ValuePropertyName { get; set; } = "Name";
     [Parameter] public EqTreeItem Item { get; set; }
     [Parameter] public EventCallback<EqTreeItem> OnItemSelected { get; set; }
+    [Parameter] public bool CompactView { get; set; } = false;
 
     protected string caretClass = "";
     protected string selectedClass = "selected-item";
