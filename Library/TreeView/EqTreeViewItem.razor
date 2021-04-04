@@ -1,6 +1,6 @@
 ﻿@typeparam TValue
 <li id="EQ-@Item.UniqueIdentifier" @onclick='ItemSelected' @onclick:stopPropagation="true"
-    class="@(CompactView?"item":"") @(Item.IsSelected&&CompactView?selectedClass:"")">
+    class="@(!CompactView?"item":"") @(Item.IsSelected&&!CompactView?selectedClass:"")">
     <div>
         @if (Item.HasChildren)
         {

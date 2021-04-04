@@ -101,26 +101,22 @@ namespace equiavia.components.Library.TreeView
             Console.WriteLine($"Successfully removed {treeItemToRemove.Label}");
             return true;
         }
-        public void Filter(string searchTerm)
+        public void Filter(string searchTerm, bool caseSensitive = false)
         {
-            var matchedItems = _treeItems.Where(i => i.Label.Contains(searchTerm)).ToList();
-            foreach(var item in _treeItems)
+            List<EqTreeItem> matchedItems = null;
+            if (caseSensitive)
             {
-                if (!matchedItems.Any(i => i.Key == item.Key))
-                {
-                    item.IsVisible = false;
-                    item.IsSelected = false;
-                }
-                else
-                {
-                    item.IsVisible = true;
-                }
+                matchedItems = _treeItems.Where(i => i.Label.Contains(searchTerm)).ToList();
+               
             }
-            foreach(var item in matchedItems)
+            else
             {
-                ShowTreeItem(item);
+                matchedItems = _treeItems.Where(i => i.Label.ToLower().Contains(searchTerm.ToLower())).ToList();
             }
+
+            FilterTreeItems(matchedItems);
         }
+
         public void SetSelectedItem(TValue item)
         {
             var treeItem = FindTreeItem(item);
@@ -278,6 +274,26 @@ namespace equiavia.components.Library.TreeView
             var childrenList = new List<EqTreeItem>();
 
             return TraverseChildren(item, childrenList);
+        }
+
+        protected void FilterTreeItems(List<EqTreeItem> matchedItems)
+        {
+            foreach (var item in _treeItems)
+            {
+                if (!matchedItems.Any(i => i.Key == item.Key))
+                {
+                    item.IsVisible = false;
+                    item.IsSelected = false;
+                }
+                else
+                {
+                    item.IsVisible = true;
+                }
+            }
+            foreach (var item in matchedItems)
+            {
+                ShowTreeItem(item);
+            }
         }
 
         protected List<EqTreeItem> TraverseChildren(EqTreeItem item, List<EqTreeItem> childrenList)

@@ -85,19 +85,26 @@
     <EditForm Model="@treeView">
         <div class="row">
             <div class="col">
-                Tree View Height
+                <b>Tree View Height</b>
                 <InputText @bind-Value="@treeView.Height"></InputText>
             </div>
         </div>
         <div class="row">
             <div class="col">
-                Filter
+                <b>Filter</b>
                 <input @onchange="SearchTermChanged" />
             </div>
         </div>
         <div class="row">
             <div class="col">
-                Compact View
+                <b>Case Insensitive Search</b>
+                <InputCheckbox @bind-Value="@caseSensitiveSearch" />
+
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                <b>Compact View</b>
                 <InputCheckbox @bind-Value="@treeView.CompactView" />
             </div>
         </div>
@@ -129,7 +136,7 @@
     private List<Employee> employees;
     private List<Employee> removedEmployees;
     private EqTreeView<Employee> treeView;
-    private string SearchTerm;
+    private bool caseSensitiveSearch;
 
     protected override async Task OnInitializedAsync()
     {
@@ -159,7 +166,7 @@
 
     protected void SearchTermChanged(ChangeEventArgs args)
     {
-        treeView.Filter(args.Value.ToString());
+        treeView.Filter(args.Value.ToString(), caseSensitiveSearch);
     }
 
     protected void ShowItem()
