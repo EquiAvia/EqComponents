@@ -47,6 +47,9 @@
         <button @onclick="MoveChildItem">
             Move the Accountant to the Director
         </button>
+        <button @onclick="MoveRootItem">
+            Move the Accountant to the Root
+        </button>
         <hr />
         <button @onclick="RemoveItem">
             Remove the CEO
@@ -194,6 +197,17 @@
             Id = 3,
             Name = "Accountant",
             ParentId = 5 // Now reports to the Director
+        };
+        treeView.Update(accountant);
+    }
+
+    protected void MoveRootItem()
+    {
+        var accountant = new Employee
+        {
+            Id = 3,
+            Name = "Accountant",
+            ParentId = null //
         };
         treeView.Update(accountant);
     }

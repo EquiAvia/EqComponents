@@ -49,7 +49,7 @@ namespace equiavia.components.Library.TreeView
             var newItem = CreateTreeItem(Item);
             if (!String.IsNullOrEmpty(newItem.ParentKey))
             {
-                SetTreeItemParent(newItem,newItem.ParentKey);
+                SetTreeItemParent(newItem,newItem.ParentKey,null);
             }
             _treeItems.Add(newItem);
         }
@@ -62,13 +62,16 @@ namespace equiavia.components.Library.TreeView
                 return;
             }
 
+            var existingParentKey = treeItem.ParentKey;
+            var newParentKey = Item.GetPropValue(ParentKeyPropertyName)?.ToString();
             var existingDatasourceItem = FindObjectFromDatasource(treeItem);
+
             //Update the Datasource
             existingDatasourceItem.ShallowCopyPropertiesFrom(Item);
             //Update the TreeViewItem
             treeItem.Label = Item.GetPropValue(ValuePropertyName)?.ToString();
-            treeItem.ParentKey = Item.GetPropValue(ParentKeyPropertyName)?.ToString();
-            SetTreeItemParent(treeItem,treeItem.ParentKey);
+
+            SetTreeItemParent(treeItem, newParentKey, existingParentKey);
         }
         public async Task<bool> Remove(TValue datasourceItemToDelete)
         {
@@ -328,9 +331,8 @@ namespace equiavia.components.Library.TreeView
             };
         }
 
-        protected void SetTreeItemParent(EqTreeItem treeItem, string newParentKey)
+        protected void SetTreeItemParent(EqTreeItem treeItem, string newParentKey, string currentParentkey = null)
         {
-            var currentParentkey = treeItem.Parent?.Key; //We use the object key to determine if the parent object has changed.
             if (currentParentkey == newParentKey)
             {
                 return; //Don't anything if the parent has not changed.
@@ -338,6 +340,7 @@ namespace equiavia.components.Library.TreeView
 
             //Delink the existing parent
             DelinkTreeItemFromParent(treeItem);
+            treeItem.ParentKey = newParentKey;
 
             if (newParentKey == null)
             {
