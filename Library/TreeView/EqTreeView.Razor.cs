@@ -16,6 +16,7 @@ namespace equiavia.components.Library.TreeView
         [Parameter] public string ParentKeyPropertyName { get; set; } = "ParentId";
         [Parameter] public EventCallback<TValue> OnItemSelected { get; set; }
         [Parameter] public EventCallback<IEnumerable<TValue>> OnItemsRemoved { get; set; }
+        [Parameter] public EventCallback<List<TValue>> DatasourceChanged { get; set; }
         [Parameter] public string Height { get; set; } = "100px";
         [Parameter] public bool CompactView { get; set; } = false;
         public EqTreeItem DraggedItem { get; set; }
@@ -43,7 +44,7 @@ namespace equiavia.components.Library.TreeView
         }
         #endregion
         #region API
-        public void Add(TValue Item)
+        public async Task Add(TValue Item)
         {
             Datasource.Add(Item);
             var newItem = CreateTreeItem(Item);
@@ -52,13 +53,15 @@ namespace equiavia.components.Library.TreeView
                 SetTreeItemParent(newItem,newItem.ParentKey,null);
             }
             _treeItems.Add(newItem);
+            await NotifyDatasourceChanged();
         }
-        public void Update(TValue Item)
+
+        public async Task Update(TValue Item)
         {
             var treeItem = FindTreeItem(Item.GetPropValue(KeyPropertyName)?.ToString());
             if (treeItem == null)
             {
-                Add(Item);
+                await Add(Item);
                 return;
             }
 
@@ -72,6 +75,7 @@ namespace equiavia.components.Library.TreeView
             treeItem.Label = Item.GetPropValue(ValuePropertyName)?.ToString();
 
             SetTreeItemParent(treeItem, newParentKey, existingParentKey);
+            await NotifyDatasourceChanged();
         }
         public async Task<bool> Remove(TValue datasourceItemToDelete)
         {
@@ -100,10 +104,11 @@ namespace equiavia.components.Library.TreeView
             }
 
             await OnItemsRemoved.InvokeAsync(eventItemsToRemove);
-
+            await NotifyDatasourceChanged();
             Console.WriteLine($"Successfully removed {treeItemToRemove.Label}");
             return true;
         }
+
         public void Filter(string searchTerm, bool caseSensitive = false)
         {
             List<EqTreeItem> matchedItems = null;
@@ -127,11 +132,11 @@ namespace equiavia.components.Library.TreeView
             ShowTreeItem(treeItem);
             js.ScrollToElement($"EQ-{treeItem.UniqueIdentifier.ToString()}");
         }
-        public void ShowItem(TValue item)
+        public async Task ShowItem(TValue item)
         {
             var treeItem = FindTreeItem(item);
             ShowTreeItem(treeItem);
-            js.ScrollToElement($"EQ-{treeItem.UniqueIdentifier.ToString()}");
+            await js.ScrollToElement($"EQ-{treeItem.UniqueIdentifier.ToString()}");
         }
         public void ExpandAll()
         {
@@ -149,7 +154,7 @@ namespace equiavia.components.Library.TreeView
             }
             Console.WriteLine("Collapse All");
         }
-        public void Refresh()
+        public async Task Refresh()
         {
             foreach (var treeItem in _treeItems)
             {
@@ -162,6 +167,8 @@ namespace equiavia.components.Library.TreeView
                     Console.WriteLine($"TreeItem {treeItem.Label} does not have an control associated with it.");
                 }
             }
+
+            await NotifyDatasourceChanged();
         }
         #endregion
         #region Helper Methods
@@ -364,6 +371,11 @@ namespace equiavia.components.Library.TreeView
                 treeItem.Parent?.Children?.Remove(treeItem);
                 treeItem.Parent = null;
             }
+        }
+
+        protected async Task NotifyDatasourceChanged()
+        {
+            await DatasourceChanged.InvokeAsync(Datasource);
         }
         #endregion
     }
