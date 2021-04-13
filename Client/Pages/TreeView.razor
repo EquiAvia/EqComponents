@@ -7,7 +7,7 @@
 <h1>Tree View </h1>
 <div class="row">
     <div class="col">
-        <EqTreeView @ref="treeView" TValue="Employee" Datasource="employees" ValuePropertyName="Name" OnItemsRemoved="ItemsRemoved"></EqTreeView>
+        <EqTreeView @ref="treeView" TValue="Employee" @bind-Datasource="employees" ValuePropertyName="Name" OnItemsRemoved="ItemsRemoved"></EqTreeView>
     </div>
     <div class="col">
         <h4>
@@ -172,14 +172,14 @@
         treeView.Filter(args.Value.ToString(), caseSensitiveSearch);
     }
 
-    protected void ShowItem()
+    protected async Task ShowItem()
     {
         var director = employees.FirstOrDefault(e => e.Name.Equals("Director"));
         //var item = treeView.FindTreeItem(director);
-        treeView.ShowItem(director);
+        await treeView.ShowItem(director);
     }
 
-    protected void AddChildItem()
+    protected async Task AddChildItem()
     {
         var cio = new Employee
         {
@@ -187,10 +187,10 @@
             Id = 100,
             ParentId = 1
         };
-        treeView.Add(cio);
+        await treeView.Add(cio);
     }
 
-    protected void MoveChildItem()
+    protected async Task MoveChildItem()
     {
         var accountant = new Employee
         {
@@ -198,10 +198,10 @@
             Name = "Accountant",
             ParentId = 5 // Now reports to the Director
         };
-        treeView.Update(accountant);
+        await treeView.Update(accountant);
     }
 
-    protected void MoveRootItem()
+    protected async Task MoveRootItem()
     {
         var accountant = new Employee
         {
@@ -209,24 +209,24 @@
             Name = "Accountant",
             ParentId = null //
         };
-        treeView.Update(accountant);
+        await treeView.Update(accountant);
     }
 
-    protected void UpdateChildItem()
+    protected async Task UpdateChildItem()
     {
         var selectedItem = treeView.SelectedItem;
         selectedItem.Name = "It Changed";
-        treeView.Update(selectedItem);
+        await treeView.Update(selectedItem);
     }
 
-    protected void AddRootItem()
+    protected async Task AddRootItem()
     {
         var cio = new Employee
         {
             Name = "Judical Observer",
             Id = 101
         };
-        treeView.Add(cio);
+        await treeView.Add(cio);
     }
 
     protected async Task RemoveItem()
@@ -243,8 +243,8 @@
         }
     }
 
-    protected void Refresh()
+    protected async Task Refresh()
     {
-        treeView.Refresh();
+       await treeView.Refresh();
     }
 }

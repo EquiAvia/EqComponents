@@ -128,9 +128,12 @@ namespace equiavia.components.Library.TreeView
         public void SetSelectedItem(TValue item)
         {
             var treeItem = FindTreeItem(item);
-            SetSelectedTreeItem(treeItem);
-            ShowTreeItem(treeItem);
-            js.ScrollToElement($"EQ-{treeItem.UniqueIdentifier.ToString()}");
+            if (treeItem != null)
+            {
+                SetSelectedTreeItem(treeItem);
+                ShowTreeItem(treeItem);
+                js.ScrollToElement($"EQ-{treeItem?.UniqueIdentifier.ToString()}");
+            }
         }
         public async Task ShowItem(TValue item)
         {
@@ -164,7 +167,7 @@ namespace equiavia.components.Library.TreeView
                 }
                 else
                 {
-                    Console.WriteLine($"TreeItem {treeItem.Label} does not have an control associated with it.");
+                    Console.WriteLine($"TreeItem {treeItem?.Label} does not have an control associated with it.");
                 }
             }
 
