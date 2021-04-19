@@ -1,5 +1,5 @@
 # EqComponents
-A set of Free Blazor only controls 
+A Free Blazor only Tree View control
 
 Add the equiavia.components.Library nuget package to you ASP.NET Core or Blazor Server project.
 
