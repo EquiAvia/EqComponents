@@ -43,6 +43,12 @@ namespace equiavia.components.Server.Controllers
                 },
                 new Employee
                 {
+                    Id=7,
+                    Name="Clerk",
+                    ParentId=3
+                },
+                new Employee
+                {
                     Id=4,
                     Name="Executive Assistant",
                     ParentId=1

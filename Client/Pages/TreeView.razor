@@ -245,6 +245,7 @@
 
     protected async Task Refresh()
     {
-       await treeView.Refresh();
+        employees = await Http.GetFromJsonAsync<List<Employee>>("Employee");
+        await treeView.Refresh(employees);
     }
 }

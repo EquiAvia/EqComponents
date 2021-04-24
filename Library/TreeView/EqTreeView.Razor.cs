@@ -157,20 +157,11 @@ namespace equiavia.components.Library.TreeView
             }
             Console.WriteLine("Collapse All");
         }
-        public async Task Refresh()
+        public async Task Refresh(List<TValue> newDatasource)
         {
-            foreach (var treeItem in _treeItems)
-            {
-                if (treeItem.eqTreeViewItem != null)
-                {
-                    (treeItem.eqTreeViewItem as EqTreeViewItem<TValue>).Refresh();
-                }
-                else
-                {
-                    Console.WriteLine($"TreeItem {treeItem?.Label} does not have an control associated with it.");
-                }
-            }
-
+            Datasource = newDatasource;
+            //Rebuild the Tree
+            _treeItems = GenerateTreeItems(Datasource);
             await NotifyDatasourceChanged();
         }
         #endregion

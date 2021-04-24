@@ -11,7 +11,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "equiavia.components.Shared"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "equiavia.components.Utilities", "equiavia.components.Utilities\equiavia.components.Utilities.csproj", "{C3C91FB2-7D2E-4708-AC1C-5374A05946B3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "equiavia.components.Library", "Library\equiavia.components.Library.csproj", "{056F0767-7EE8-4DDC-9CE0-567D0EEFE23D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "equiavia.components.Library", "Library\equiavia.components.Library.csproj", "{056F0767-7EE8-4DDC-9CE0-567D0EEFE23D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
