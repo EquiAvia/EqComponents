@@ -1,7 +1,7 @@
 ﻿@typeparam TValue
 <li id="EQ-@Item.UniqueIdentifier" @onclick='ItemSelected' @onclick:stopPropagation="true"
     class="@(!CompactView?"item":"") @(Item.IsSelected&&!CompactView?selectedClass:"")">
-    <div>
+    <div class="@(CompactView?"compact-item":"")">
         @if (Item.HasChildren)
         {
             <span class="caret @(Item.IsExpanded ? "caret-down" : "")" @onclick="ToggleExpand" @onclick:stopPropagation="true"></span>

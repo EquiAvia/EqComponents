@@ -32,7 +32,8 @@ ul {
 
 
 .item {
-    margin-bottom: 5px;
+    margin-bottom: 3px;
+    margin-top: 3px;
     padding: 10px 15px;
     border: 1px solid #000000;
     cursor: pointer;
@@ -40,6 +41,11 @@ ul {
     background-color: #2F5170;
     border-radius: 5px;
     width: 300px;
+}
+
+.compact-item {
+    padding: 3px;
+    cursor: pointer;
 }
 
 li {
