@@ -18,6 +18,10 @@
                                     CompactView="@CompactView"></EqTreeViewItem>
                 }
             </ul>
+            @if (NoRecordsFoundTemplate!=null && !_treeItems.Where(i => i.IsVisible == true).Any())
+            {
+                @NoRecordsFoundTemplate
+            }
         </div>
     </CascadingValue>
 }

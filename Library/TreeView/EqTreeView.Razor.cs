@@ -14,6 +14,7 @@ namespace equiavia.components.Library.TreeView
         [Parameter] public string KeyPropertyName { get; set; } = "Id";
         [Parameter] public string ValuePropertyName { get; set; } = "Name";
         [Parameter] public string ParentKeyPropertyName { get; set; } = "ParentId";
+        [Parameter] public RenderFragment NoRecordsFoundTemplate { get; set; }
         [Parameter] public EventCallback<TValue> OnItemSelected { get; set; }
         [Parameter] public EventCallback<IEnumerable<TValue>> OnItemsRemoved { get; set; }
         [Parameter] public EventCallback<List<TValue>> DatasourceChanged { get; set; }
