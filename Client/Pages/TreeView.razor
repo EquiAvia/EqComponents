@@ -6,282 +6,292 @@
 
 <h1>Tree View </h1>
 <div class="row">
-    <div class="col">
-        <EqTreeView @ref="treeView" TValue="Employee" @bind-Datasource="employees" ValuePropertyName="Name" OnItemsRemoved="ItemsRemoved" OnItemDoubleClicked="ItemDoubleClicked" OnItemRightClicked="ItemRightClicked">
-            <NoRecordsFoundTemplate>
-                <div class="border text-center">
-                    No Records Found
-                </div>
-            </NoRecordsFoundTemplate>
-        </EqTreeView>
-    </div>
-    <div class="col">
-        <h4>
-            Current Content of the Datasource
-        </h4>
-        <ul>
-            @if (employees != null)
-            {
-                @foreach (var item in employees)
-                {
-                    <li>@item.Id - @item.Name - @item.ParentId</li>
-                }
-            }
-            else
-            {
-                <li>None</li>
-            }
-        </ul>
-    </div>
+	<div class="col">
+		<EqTreeView @ref="treeView" TValue="Employee" @bind-Datasource="employees" ValuePropertyName="Name" OnItemsRemoved="ItemsRemoved" OnItemDoubleClicked="ItemDoubleClicked" OnItemRightClicked="ItemRightClicked">
+			<NoRecordsFoundTemplate>
+				<div class="border text-center">
+					No Records Found
+				</div>
+			</NoRecordsFoundTemplate>
+			<ItemTemplate Context="Item">
+				@if (Item.IsSelected)
+				{
+					<span>Selected - </span>@Item.Label
+				}
+				else
+				{
+					@Item.Label
+				}
+			</ItemTemplate>
+		</EqTreeView>
+	</div>
+	<div class="col">
+		<h4>
+			Current Content of the Datasource
+		</h4>
+		<ul>
+			@if (employees != null)
+			{
+				@foreach (var item in employees)
+				{
+					<li>@item.Id - @item.Name - @item.ParentId</li>
+				}
+			}
+			else
+			{
+				<li>None</li>
+			}
+		</ul>
+	</div>
 </div>
 
 <div class="row">
-    <div class="col">
-        <h4>
-            CRUD
-        </h4>
-        <button @onclick="AddRootItem">
-            Add a Root Item
-        </button>
-        <button @onclick="AddChildItem">
-            Add a CIO to CEO
-        </button>
-        <hr />
-        <button @onclick="UpdateChildItem">
-            Update text of the selected Item
-        </button>
-        <button @onclick="MoveChildItem">
-            Move the Accountant to the Director
-        </button>
-        <button @onclick="MoveRootItem">
-            Move the Accountant to the Root
-        </button>
-        <hr />
-        <button @onclick="RemoveItem">
-            Remove the CEO
-        </button>
-        <button @onclick="RemoveSelectedItem">
-            Remove the Selected Item
-        </button>
+	<div class="col">
+		<h4>
+			CRUD
+		</h4>
+		<button @onclick="AddRootItem">
+			Add a Root Item
+		</button>
+		<button @onclick="AddChildItem">
+			Add a CIO to CEO
+		</button>
+		<hr />
+		<button @onclick="UpdateChildItem">
+			Update text of the selected Item
+		</button>
+		<button @onclick="MoveChildItem">
+			Move the Accountant to the Director
+		</button>
+		<button @onclick="MoveRootItem">
+			Move the Accountant to the Root
+		</button>
+		<hr />
+		<button @onclick="RemoveItem">
+			Remove the CEO
+		</button>
+		<button @onclick="RemoveSelectedItem">
+			Remove the Selected Item
+		</button>
 
-    </div>
-    <div class="col">
-        <h4>Tree Controls</h4>
-        <button @onclick="ExpandAll">
-            Expand All
-        </button>
-        <button @onclick="CollapseAll">
-            Collapse All
-        </button>
-        <hr />
-        <button @onclick="SetSelectedItem">
-            Select the Accountant
-        </button>
-        <button @onclick="ShowItem">
-            Show the Director
-        </button> 
-    </div>
-    <div class="col">
-        <h4>
-            Misc
-        </h4>
-        <button @onclick="Refresh">
-            Refresh the TreeView
-        </button>
-        <hr />
-        @if (treeView != null)
-        {
-    <EditForm Model="@treeView">
-        <div class="row">
-            <div class="col">
-                <b>Tree View Height</b>
-                <InputText @bind-Value="@treeView.Height"></InputText>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col">
-                <b>Filter</b>
-                <input @onchange="SearchTermChanged" />
-            </div>
-        </div>
-        <div class="row">
-            <div class="col">
-                <b>Case Insensitive Search</b>
-                <InputCheckbox @bind-Value="@caseSensitiveSearch" />
+	</div>
+	<div class="col">
+		<h4>Tree Controls</h4>
+		<button @onclick="ExpandAll">
+			Expand All
+		</button>
+		<button @onclick="CollapseAll">
+			Collapse All
+		</button>
+		<hr />
+		<button @onclick="SetSelectedItem">
+			Select the Accountant
+		</button>
+		<button @onclick="ShowItem">
+			Show the Director
+		</button>
+	</div>
+	<div class="col">
+		<h4>
+			Misc
+		</h4>
+		<button @onclick="Refresh">
+			Refresh the TreeView
+		</button>
+		<hr />
+		@if (treeView != null)
+		{
+			<EditForm Model="@treeView">
+				<div class="row">
+					<div class="col">
+						<b>Tree View Height</b>
+						<InputText @bind-Value="@treeView.Height"></InputText>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col">
+						<b>Filter</b>
+						<input @onchange="SearchTermChanged" />
+					</div>
+				</div>
+				<div class="row">
+					<div class="col">
+						<b>Case Insensitive Search</b>
+						<InputCheckbox @bind-Value="@caseSensitiveSearch" />
 
-            </div>
-        </div>
-        <div class="row">
-            <div class="col">
-                <b>Compact View</b>
-                <InputCheckbox @bind-Value="@treeView.CompactView" />
-            </div>
-        </div>
-    </EditForm>
-        }
-    </div>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col">
+						<b>Compact View</b>
+						<InputCheckbox @bind-Value="@treeView.CompactView" />
+					</div>
+				</div>
+			</EditForm>
+		}
+	</div>
 </div>
 <hr />
 <h4>
-    Events Fired    
+	Events Fired
 </h4>
 <ul>
-          @if (eventsFired != null)
-    {
-        @foreach (var item in      eventsFired)
-        {
-            <li>@item</li>
-        }
-    }
-    else
-    {
-        <li>None</li>
-    }
+	@if (eventsFired != null)
+	{
+		@foreach (var item in eventsFired)
+		{
+			<li>@item</li>
+		}
+	}
+	else
+	{
+		<li>None</li>
+	}
 </ul>
 
-       <h4>      
-    Re     moved Employees
+<h4>
+	Re     moved Employees
 </h4>
 <ul>
 
-    @if (removedEmployees != null)
-    {
-        @foreach (var item in removedEmployees)
-        {
-            <li>@item.Id - @item.Name - @item.ParentId</li>
-        }
-    }
-    else
-    {
-        <li>None</li>
-    }
-</ul>   
+	@if (removedEmployees != null)
+	{
+		@foreach (var item in removedEmployees)
+		{
+			<li>@item.Id - @item.Name - @item.ParentId</li>
+		}
+	}
+	else
+	{
+		<li>None</li>
+	}
+</ul>
 
 
 @code {
-    private List<Employee> employees;
-    private List<Employee> removedEmployees;
-    private List<String> eventsFired = new();
-    private EqTreeView<Employee> treeView;
-    private bool caseSensitiveSearch;
+	private List<Employee> employees;
+	private List<Employee> removedEmployees;
+	private List<String> eventsFired = new();
+	private EqTreeView<Employee> treeView;
+	private bool caseSensitiveSearch;
 
-    protected override async Task OnInitializedAsync()
-    {
-        employees = await Http.GetFromJsonAsync<List<Employee>>("Employee");
-    }
+	protected override async Task OnInitializedAsync()
+	{
+		employees = await Http.GetFromJsonAsync<List<Employee>>("Employee");
+	}
 
-    protected void ItemsRemoved(IEnumerable<Employee> removedItems)   
-    {
-        removedEmployees = new List<Employee>(removedItems);
-        eventsFired.Add($"{removedItems.Count()    } Item/s removed clicked");
-    }
+	protected void ItemsRemoved(IEnumerable<Employee> removedItems)
+	{
+		removedEmployees = new List<Employee>(removedItems);
+		eventsFired.Add($"{removedItems.Count()    } Item/s removed clicked");
+	}
 
 
-    protected void ItemDoubleClicked(Employee item )
-    {
-        eventsFired.Add($"{item.Name} double clicked");     
-    }
+	protected void ItemDoubleClicked(Employee item)
+	{
+		eventsFired.Add($"{item.Name} double clicked");
+	}
 
-          protected void ItemRightClicked(Employee item)
-    {
-        eventsFired.Add($"{item.Name} right       clicked");
-    }    
+	protected void ItemRightClicked(Employee item)
+	{
+		eventsFired.Add($"{item.Name} right       clicked");
+	}
 
-    protected void ExpandAll()
-    {
-        treeView.ExpandAll();
-    }
+	protected void ExpandAll()
+	{
+		treeView.ExpandAll();
+	}
 
-    protected void CollapseAll()
-    {
-        treeView.CollapseAll();
-    }
+	protected void CollapseAll()
+	{
+		treeView.CollapseAll();
+	}
 
-    protected async Task SetSelectedItem()
-    {
-        var accountant = employees.FirstOrDefault(e => e.Name.Equals("Accountant"));
-        await treeView.SetSelectedItem(accountant);
-    }
+	protected async Task SetSelectedItem()
+	{
+		var accountant = employees.FirstOrDefault(e => e.Name.Equals("Accountant"));
+		await treeView.SetSelectedItem(accountant);
+	}
 
-     protected void SearchTermChanged(ChangeEventArgs args)
-    {
-        treeView.Filter(args.Value.ToString(), caseSensitiveSearch);
-    }
+	protected void SearchTermChanged(ChangeEventArgs args)
+	{
+		treeView.Filter(args.Value.ToString(), caseSensitiveSearch);
+	}
 
-    protected async Task ShowItem()
-    {
-        var director = employees.FirstOrDefault(e => e.Name.Equals("Director"));
-        //var item = treeView.FindTreeItem(director);
-        await treeView.ShowItem(director);
-    }
+	protected async Task ShowItem()
+	{
+		var director = employees.FirstOrDefault(e => e.Name.Equals("Director"));
+		//var item = treeView.FindTreeItem(director);
+		await treeView.ShowItem(director);
+	}
 
-    protected async Task AddChildItem()
-    {
-        var cio = new Employee
-        {
-            Name = "CIO",
-            Id = 100,
-            ParentId = 1
-        };
-        await treeView.Add(cio);
-    }
+	protected async Task AddChildItem()
+	{
+		var cio = new Employee
+			{
+				Name = "CIO",
+				Id = 100,
+				ParentId = 1
+			};
+		await treeView.Add(cio);
+	}
 
-    protected async Task MoveChildItem()
-    {
-        var accountant = new Employee
-        {
-            Id = 3,
-            Name = "Accountant",
-            ParentId = 5 // Now reports to the Director
-        };
-        await treeView.Update(accountant);
-    }
+	protected async Task MoveChildItem()
+	{
+		var accountant = new Employee
+			{
+				Id = 3,
+				Name = "Accountant",
+				ParentId = 5 // Now reports to the Director
+			};
+		await treeView.Update(accountant);
+	}
 
-    protected async Task MoveRootItem()
-    {
-        var accountant = new Employee
-        {
-            Id = 3,
-            Name = "Accountant",
-            ParentId = null //
-        };
-        await treeView.Update(accountant);
-    }
+	protected async Task MoveRootItem()
+	{
+		var accountant = new Employee
+			{
+				Id = 3,
+				Name = "Accountant",
+				ParentId = null //
+			};
+		await treeView.Update(accountant);
+	}
 
-    protected async Task UpdateChildItem()
-    {
-        var selectedItem = treeView.SelectedItem;
-        selectedItem.Name = "It Changed";
-        await treeView.Update(selectedItem);
-    }
+	protected async Task UpdateChildItem()
+	{
+		var selectedItem = treeView.SelectedItem;
+		selectedItem.Name = "It Changed";
+		await treeView.Update(selectedItem);
+	}
 
-    protected async Task AddRootItem()
-    {
-        var cio = new Employee
-        {
-            Name = "Judical Observer",
-            Id = 101
-        };
-        await treeView.Add(cio);
-    }
+	protected async Task AddRootItem()
+	{
+		var cio = new Employee
+			{
+				Name = "Judical Observer",
+				Id = 101
+			};
+		await treeView.Add(cio);
+	}
 
-    protected async Task RemoveItem()
-    {
-        var ceo = employees.FirstOrDefault(e => e.Name.Equals("CEO"));
-        await treeView.Remove(ceo);
-    }
+	protected async Task RemoveItem()
+	{
+		var ceo = employees.FirstOrDefault(e => e.Name.Equals("CEO"));
+		await treeView.Remove(ceo);
+	}
 
-    protected async Task RemoveSelectedItem()
-    {
-        if (!await treeView.Remove(treeView.SelectedItem))
-        {
-            Console.WriteLine("Please select an item to remove");
-        }
-    }
+	protected async Task RemoveSelectedItem()
+	{
+		if (!await treeView.Remove(treeView.SelectedItem))
+		{
+			Console.WriteLine("Please select an item to remove");
+		}
+	}
 
-    protected async Task Refresh()
-    {
-        employees = await Http.GetFromJsonAsync<List<Employee>>("Employee");
-        await treeView.Refresh(employees);
-    }
+	protected async Task Refresh()
+	{
+		employees = await Http.GetFromJsonAsync<List<Employee>>("Employee");
+		await treeView.Refresh(employees);
+	}
 }

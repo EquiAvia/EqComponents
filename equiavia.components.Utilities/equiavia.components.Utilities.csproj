@@ -1,8 +1,8 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net5.0</TargetFramework>
-    <Version>0.0.0.6</Version>
+    <TargetFramework>net6.0</TargetFramework>
+    <Version>6.0.0</Version>
     <Company>EQUIAVIA Ltd.</Company>
     <Authors>Basil Buwalda</Authors>
     <Description>A set of extension methods for c# classes</Description>

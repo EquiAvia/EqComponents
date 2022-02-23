@@ -3,7 +3,7 @@
 	@onclick='ItemSelected'					@onclick:stopPropagation="true" 
 	@ondblclick='ItemDoubleClicked'			@ondblclick:stopPropagation="true"
 	@oncontextmenu='ContextMenuRequested'	@oncontextmenu:preventDefault="true"	@oncontextmenu:stopPropagation="true"
-	class="@(!CompactView?"item":"") @(Item.IsSelected&&!CompactView?SelectedCSSClass:"")">
+	class="@(!CompactView?ItemCSSClass:"") @(Item.IsSelected&&!CompactView?SelectedCSSClass:"")">
 	<div class="@(CompactView?"compact-item":"")">
 		@if (Item.HasChildren)
 		{
@@ -22,7 +22,7 @@
 		}
 		else
 		{
-			ItemTemplate(Item);
+			@ItemTemplate.Invoke(Item);
 		}
 		@if (Item.HasChildren && Item.IsExpanded)
 		{
@@ -38,6 +38,7 @@
 							OnItemSelected="@OnItemSelected"
 							OnItemDoubleClicked="@OnItemDoubleClicked"
 							OnItemRightClicked="@OnItemRightClicked"
+							ItemTemplate="@ItemTemplate"
 							CompactView="@CompactView"></EqTreeViewItem>
 				}
 			</ul>
@@ -56,6 +57,7 @@
 	[Parameter] public bool CompactView { get; set; } = false;
 	[Parameter] public RenderFragment<EqTreeItem> ItemTemplate { get; set; }
 	[Parameter] public string SelectedCSSClass { get; set; } = "selected-item";
+	[Parameter] public string ItemCSSClass { get; set; } = "item";
 
 	protected string caretClass = "";
 
