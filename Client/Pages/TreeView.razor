@@ -7,7 +7,7 @@
 <h1>Tree View </h1>
 <div class="row">
     <div class="col">
-        <EqTreeView @ref="treeView" TValue="Employee" @bind-Datasource="employees" ValuePropertyName="Name" OnItemsRemoved="ItemsRemoved">
+        <EqTreeView @ref="treeView" TValue="Employee" @bind-Datasource="employees" ValuePropertyName="Name" OnItemsRemoved="ItemsRemoved" OnItemDoubleClicked="ItemDoubleClicked" OnItemRightClicked="ItemRightClicked">
             <NoRecordsFoundTemplate>
                 <div class="border text-center">
                     No Records Found
@@ -79,7 +79,7 @@
         </button>
         <button @onclick="ShowItem">
             Show the Director
-        </button>
+        </button> 
     </div>
     <div class="col">
         <h4>
@@ -123,7 +123,24 @@
 </div>
 <hr />
 <h4>
-    Removed Employees
+    Events Fired    
+</h4>
+<ul>
+          @if (eventsFired != null)
+    {
+        @foreach (var item in      eventsFired)
+        {
+            <li>@item</li>
+        }
+    }
+    else
+    {
+        <li>None</li>
+    }
+</ul>
+
+       <h4>      
+    Re     moved Employees
 </h4>
 <ul>
 
@@ -138,12 +155,13 @@
     {
         <li>None</li>
     }
-</ul>
+</ul>   
 
 
 @code {
     private List<Employee> employees;
     private List<Employee> removedEmployees;
+    private List<String> eventsFired = new();
     private EqTreeView<Employee> treeView;
     private bool caseSensitiveSearch;
 
@@ -152,10 +170,22 @@
         employees = await Http.GetFromJsonAsync<List<Employee>>("Employee");
     }
 
-    protected void ItemsRemoved(IEnumerable<Employee> removedItems)
+    protected void ItemsRemoved(IEnumerable<Employee> removedItems)   
     {
         removedEmployees = new List<Employee>(removedItems);
+        eventsFired.Add($"{removedItems.Count()    } Item/s removed clicked");
     }
+
+
+    protected void ItemDoubleClicked(Employee item )
+    {
+        eventsFired.Add($"{item.Name} double clicked");     
+    }
+
+          protected void ItemRightClicked(Employee item)
+    {
+        eventsFired.Add($"{item.Name} right       clicked");
+    }    
 
     protected void ExpandAll()
     {
@@ -173,7 +203,7 @@
         await treeView.SetSelectedItem(accountant);
     }
 
-    protected void SearchTermChanged(ChangeEventArgs args)
+     protected void SearchTermChanged(ChangeEventArgs args)
     {
         treeView.Filter(args.Value.ToString(), caseSensitiveSearch);
     }
