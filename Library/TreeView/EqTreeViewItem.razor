@@ -1,64 +1,89 @@
 ﻿@typeparam TValue
-<li id="EQ-@Item.UniqueIdentifier" @onclick='ItemSelected' @onclick:stopPropagation="true"
-    class="@(!CompactView?"item":"") @(Item.IsSelected&&!CompactView?selectedClass:"")">
-    <div class="@(CompactView?"compact-item":"")">
-        @if (Item.HasChildren)
-        {
-            <span class="caret @(Item.IsExpanded ? "caret-down" : "")" @onclick="ToggleExpand" @onclick:stopPropagation="true"></span>
-        }
-        @if (Item.IsSelected)
-        {
-            <b>@Item.Label</b>
-        }
-        else
-        {
-            @Item.Label
-        }
-        @if (Item.HasChildren && Item.IsExpanded)
-        {
-            <ul>
-                @foreach (var child in Item.Children.Where(i => i.IsVisible))
-                {
-                    <EqTreeViewItem TValue=@TValue
-                                    @ref="@child.eqTreeViewItem"
-                                    Item="@child"
-                                    KeyPropertyName="@KeyPropertyName"
-                                    ValuePropertyName="@ValuePropertyName"
-                                    @key="@child.UniqueIdentifier"
-                                    OnItemSelected="@OnItemSelected"
-                                    CompactView="@CompactView"></EqTreeViewItem>
-                }
-            </ul>
-        }
-    </div>
+<li id="EQ-@Item.UniqueIdentifier" @onclick='ItemSelected' @onclick:stopPropagation="true" @ondblclick='ItemDoubleClicked' @ondblclick:stopPropagation="true"
+	class="@(!CompactView?"item":"") @(Item.IsSelected&&!CompactView?SelectedCSSClass:"")">
+	<div class="@(CompactView?"compact-item":"")">
+		@if (Item.HasChildren)
+		{
+			<span class="caret @(Item.IsExpanded ? "caret-down" : "")" @onclick="ToggleExpand" @onclick:stopPropagation="true"></span>
+		}
+		@if (ItemTemplate == null)
+		{
+			@if (Item.IsSelected)
+			{
+				<b>@Item.Label</b>
+			}
+			else
+			{
+				@Item.Label
+			}
+		}
+		else
+		{
+			ItemTemplate(Item);
+		}
+		@if (Item.HasChildren && Item.IsExpanded)
+		{
+			<ul>
+				@foreach (var child in Item.Children.Where(i => i.IsVisible))
+				{
+					<EqTreeViewItem TValue=@TValue
+							@ref="@child.eqTreeViewItem"
+							Item="@child"
+							KeyPropertyName="@KeyPropertyName"
+							ValuePropertyName="@ValuePropertyName"
+							@key="@child.UniqueIdentifier"
+							OnItemSelected="@OnItemSelected"
+							OnItemDoubleClicked="@OnItemDoubleClicked"
+							OnItemRightClicked="@OnItemRightClicked"
+							CompactView="@CompactView"></EqTreeViewItem>
+				}
+			</ul>
+		}
+	</div>
 </li>
 
 @code {
-    [CascadingParameter] public EqTreeView<TValue> EqTreeView { get; set; }
-    [Parameter] public string KeyPropertyName { get; set; } = "Id";
-    [Parameter] public string ValuePropertyName { get; set; } = "Name";
-    [Parameter] public EqTreeItem Item { get; set; }
-    [Parameter] public EventCallback<EqTreeItem> OnItemSelected { get; set; }
-    [Parameter] public bool CompactView { get; set; } = false;
+	[CascadingParameter] public EqTreeView<TValue> EqTreeView { get; set; }
+	[Parameter] public string KeyPropertyName { get; set; } = "Id";
+	[Parameter] public string ValuePropertyName { get; set; } = "Name";
+	[Parameter] public EqTreeItem Item { get; set; }
+	[Parameter] public EventCallback<EqTreeItem> OnItemSelected { get; set; }
+	[Parameter] public EventCallback<EqTreeItem> OnItemDoubleClicked { get; set; }
+	[Parameter] public EventCallback<EqTreeItem> OnItemRightClicked { get; set; }
+	[Parameter] public bool CompactView { get; set; } = false;
+	[Parameter] public RenderFragment<EqTreeItem> ItemTemplate { get; set; }
+	[Parameter] public string SelectedCSSClass { get; set; } = "selected-item";
 
-    protected string caretClass = "";
-    protected string selectedClass = "selected-item";
+	protected string caretClass = "";
 
-    protected async Task ItemSelected(MouseEventArgs args)
-    {
-        Item.IsSelected = true;
-        await OnItemSelected.InvokeAsync(Item);
-    }
+	protected async Task ItemSelected(MouseEventArgs args)
+	{
+		Item.IsSelected = true;
+		if (args.Button == 2) //Right button clicked
+		{
+			await OnItemRightClicked.InvokeAsync(Item);
+		}
+		else
+		{
+			await OnItemSelected.InvokeAsync(Item);
+		}
+	}
 
-    protected void ToggleExpand(MouseEventArgs args)
-    {
-        Item.IsExpanded = !Item.IsExpanded;
-    }
+	protected async Task ItemDoubleClicked(MouseEventArgs args)
+	{
+		Item.IsSelected = true;
+		await OnItemDoubleClicked.InvokeAsync(Item);
+	}
 
-    public void Refresh()
-    {
-        this.StateHasChanged();
-        Console.WriteLine($"Refreshed {Item.Label}");
-    }
+	protected void ToggleExpand(MouseEventArgs args)
+	{
+		Item.IsExpanded = !Item.IsExpanded;
+	}
+
+	public void Refresh()
+	{
+		this.StateHasChanged();
+		Console.WriteLine($"Refreshed {Item.Label}");
+	}
 
 }

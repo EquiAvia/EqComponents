@@ -14,8 +14,12 @@ namespace equiavia.components.Library.TreeView
         [Parameter] public string KeyPropertyName { get; set; } = "Id";
         [Parameter] public string ValuePropertyName { get; set; } = "Name";
         [Parameter] public string ParentKeyPropertyName { get; set; } = "ParentId";
+        [Parameter] public string SelectedCSSClass { get; set; } = "selected-item";
         [Parameter] public RenderFragment NoRecordsFoundTemplate { get; set; }
+        [Parameter] public RenderFragment<EqTreeItem> ItemTemplate { get; set; }
         [Parameter] public EventCallback<TValue> OnItemSelected { get; set; }
+        [Parameter] public EventCallback<TValue> OnItemDoubleClicked { get; set; }
+        [Parameter] public EventCallback<TValue> OnItemRightClicked { get; set; }
         [Parameter] public EventCallback<IEnumerable<TValue>> OnItemsRemoved { get; set; }
         [Parameter] public EventCallback<List<TValue>> DatasourceChanged { get; set; }
         [Parameter] public string Height { get; set; } = "100px";
@@ -126,14 +130,14 @@ namespace equiavia.components.Library.TreeView
             FilterTreeItems(matchedItems);
         }
 
-        public void SetSelectedItem(TValue item)
+        public async Task SetSelectedItem(TValue item)
         {
             var treeItem = FindTreeItem(item);
             if (treeItem != null)
             {
                 SetSelectedTreeItem(treeItem);
                 ShowTreeItem(treeItem);
-                js.ScrollToElement($"EQ-{treeItem?.UniqueIdentifier.ToString()}");
+                await js.ScrollToElement($"EQ-{treeItem?.UniqueIdentifier.ToString()}");
             }
         }
         public async Task ShowItem(TValue item)
@@ -186,6 +190,24 @@ namespace equiavia.components.Library.TreeView
             var originalObject = FindObjectFromDatasource(selectedItem);
 
             await OnItemSelected.InvokeAsync(originalObject);
+        }
+
+        protected async Task ItemRightClicked(EqTreeItem selectedItem)
+        {
+            SetSelectedTreeItem(selectedItem);
+
+            var originalObject = FindObjectFromDatasource(selectedItem);
+
+            await OnItemRightClicked.InvokeAsync(originalObject);
+        }
+
+        protected async Task ItemDoubleClicked(EqTreeItem selectedItem)
+        {
+            SetSelectedTreeItem(selectedItem);
+
+            var originalObject = FindObjectFromDatasource(selectedItem);
+
+            await OnItemDoubleClicked.InvokeAsync(originalObject);
         }
 
         protected void SetSelectedTreeItem(EqTreeItem newSelectedItem)

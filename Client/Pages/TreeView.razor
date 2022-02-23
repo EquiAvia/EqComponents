@@ -167,10 +167,10 @@
         treeView.CollapseAll();
     }
 
-    protected void SetSelectedItem()
+    protected async Task SetSelectedItem()
     {
         var accountant = employees.FirstOrDefault(e => e.Name.Equals("Accountant"));
-        treeView.SetSelectedItem(accountant);
+        await treeView.SetSelectedItem(accountant);
     }
 
     protected void SearchTermChanged(ChangeEventArgs args)
