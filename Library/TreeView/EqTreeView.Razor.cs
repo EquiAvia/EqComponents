@@ -24,6 +24,7 @@ namespace equiavia.components.Library.TreeView
         [Parameter] public EventCallback<List<TValue>> DatasourceChanged { get; set; }
         [Parameter] public string Height { get; set; } = "100px";
         [Parameter] public bool CompactView { get; set; } = false;
+        [Parameter] public int MaxNumOfRootNodesToDisplay { get; set; } = 100000;
         public EqTreeItem DraggedItem { get; set; }
         [Inject]
         public TreeViewJSInterop js { get; set; }

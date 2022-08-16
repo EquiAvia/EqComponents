@@ -6,7 +6,7 @@
     <CascadingValue TValue="EqTreeView<TValue>" Value="@this">
         <div class="treeview-container" style="max-height:@Height;">
             <ul class="noselect">
-                @foreach (var item in _treeItems.Where(i => i.IsRootNode && i.IsVisible).ToList())
+                @foreach (var item in _treeItems.Where(i => i.IsRootNode && i.IsVisible).Take(MaxNumOfRootNodesToDisplay).ToList())
                 {
                     <EqTreeViewItem TValue=@TValue
                                     @ref="@item.eqTreeViewItem"

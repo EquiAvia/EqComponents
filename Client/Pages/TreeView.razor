@@ -7,7 +7,17 @@
 <h1>Tree View </h1>
 <div class="row">
 	<div class="col">
-		<EqTreeView @ref="treeView" Height="300px" TValue="Employee" @bind-Datasource="employees" ValuePropertyName="Name" OnItemsRemoved="ItemsRemoved" OnItemDoubleClicked="ItemDoubleClicked" OnItemRightClicked="ItemRightClicked">
+		<EqTreeView 
+			@ref="treeView" 
+			Height="300px" 
+			TValue="Employee" 
+			@bind-Datasource="employees" 
+			ValuePropertyName="Name" 
+			OnItemsRemoved="ItemsRemoved" 
+			OnItemDoubleClicked="ItemDoubleClicked" 
+			OnItemRightClicked="ItemRightClicked" 
+			SelectedCSSClass=""
+			MaxNumOfRootNodesToDisplay="4">
 			<NoRecordsFoundTemplate>
 				<div class="border text-center">
 					No Records Found
@@ -150,7 +160,7 @@
 </ul>
 
 <h4>
-	Re     moved Employees
+	Removed Employees
 </h4>
 <ul>
 
