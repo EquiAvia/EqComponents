@@ -3,3 +3,7 @@
     background-color: lightblue;
     width: 100%
 }
+
+.treeview-container {
+    border-width: inherit;
+}

@@ -14,5 +14,5 @@ ul {
 
 .treeview-container {
     overflow-y: auto;
-    border-width: thin;
+    border-width: inherit;
 }
