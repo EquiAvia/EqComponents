@@ -15,8 +15,9 @@ namespace equiavia.components.Library.TreeView
         [Parameter] public string ValuePropertyName { get; set; } = "Name";
         [Parameter] public string ParentKeyPropertyName { get; set; } = "ParentId";
         [Parameter] public string SelectedCSSClass { get; set; } = "selected-item";
+        [Parameter] public string ItemCSSClass { get; set; } = "item";
         [Parameter] public RenderFragment NoRecordsFoundTemplate { get; set; }
-        [Parameter] public RenderFragment<EqTreeItem> ItemTemplate { get; set; }
+        [Parameter] public RenderFragment<EqTreeItem<TValue>> ItemTemplate { get; set; }
         [Parameter] public EventCallback<TValue> OnItemSelected { get; set; }
         [Parameter] public EventCallback<TValue> OnItemDoubleClicked { get; set; }
         [Parameter] public EventCallback<TValue> OnItemRightClicked { get; set; }
@@ -25,7 +26,7 @@ namespace equiavia.components.Library.TreeView
         [Parameter] public string Height { get; set; } = "100px";
         [Parameter] public bool CompactView { get; set; } = false;
         [Parameter] public int MaxNumOfRootNodesToDisplay { get; set; } = 100000;
-        public EqTreeItem DraggedItem { get; set; }
+        public EqTreeItem<TValue> DraggedItem { get; set; }
         [Inject]
         public TreeViewJSInterop js { get; set; }
         public TValue SelectedItem
@@ -35,8 +36,8 @@ namespace equiavia.components.Library.TreeView
                 return FindObjectFromDatasource(_selectedItem);
             }
         }
-        protected List<EqTreeItem> _treeItems;
-        protected EqTreeItem _selectedItem;
+        protected List<EqTreeItem<TValue>> _treeItems;
+        protected EqTreeItem<TValue> _selectedItem;
 
 
         #region Life Cycle Methods
@@ -117,7 +118,7 @@ namespace equiavia.components.Library.TreeView
 
         public void Filter(string searchTerm, bool caseSensitive = false)
         {
-            List<EqTreeItem> matchedItems = null;
+            List<EqTreeItem<TValue>> matchedItems = null;
             if (caseSensitive)
             {
                 matchedItems = _treeItems.Where(i => i.Label.Contains(searchTerm)).ToList();
@@ -172,7 +173,7 @@ namespace equiavia.components.Library.TreeView
         }
         #endregion
         #region Helper Methods
-        protected void ShowTreeItem(EqTreeItem eqTreeItem)
+        protected void ShowTreeItem(EqTreeItem<TValue> eqTreeItem)
         {
             if (eqTreeItem == null)
             {
@@ -184,7 +185,7 @@ namespace equiavia.components.Library.TreeView
             ShowTreeItem(eqTreeItem.Parent);
         }
 
-        protected async Task ItemSelected(EqTreeItem selectedItem)
+        protected async Task ItemSelected(EqTreeItem<TValue> selectedItem)
         {
             SetSelectedTreeItem(selectedItem);
 
@@ -193,7 +194,7 @@ namespace equiavia.components.Library.TreeView
             await OnItemSelected.InvokeAsync(originalObject);
         }
 
-        protected async Task ItemRightClicked(EqTreeItem selectedItem)
+        protected async Task ItemRightClicked(EqTreeItem<TValue> selectedItem)
         {
             SetSelectedTreeItem(selectedItem);
 
@@ -202,7 +203,7 @@ namespace equiavia.components.Library.TreeView
             await OnItemRightClicked.InvokeAsync(originalObject);
         }
 
-        protected async Task ItemDoubleClicked(EqTreeItem selectedItem)
+        protected async Task ItemDoubleClicked(EqTreeItem<TValue> selectedItem)
         {
             SetSelectedTreeItem(selectedItem);
 
@@ -211,7 +212,7 @@ namespace equiavia.components.Library.TreeView
             await OnItemDoubleClicked.InvokeAsync(originalObject);
         }
 
-        protected void SetSelectedTreeItem(EqTreeItem newSelectedItem)
+        protected void SetSelectedTreeItem(EqTreeItem<TValue> newSelectedItem)
         {
             if (_selectedItem != null)
             {
@@ -224,14 +225,14 @@ namespace equiavia.components.Library.TreeView
             }
         }
 
-        protected List<EqTreeItem> GenerateTreeItems(List<TValue> datasource)
+        protected List<EqTreeItem<TValue>> GenerateTreeItems(List<TValue> datasource)
         {
             if (datasource == null)
             {
                 return null;
             }
 
-            var treeItems = new List<EqTreeItem>();
+            var treeItems = new List<EqTreeItem<TValue>>();
 
             foreach (var item in datasource)
             {
@@ -246,7 +247,7 @@ namespace equiavia.components.Library.TreeView
             return treeItems;
         }
 
-        protected void AddChildren(EqTreeItem treeItem, IEnumerable<EqTreeItem> treeItems)
+        protected void AddChildren(EqTreeItem<TValue> treeItem, IEnumerable<EqTreeItem<TValue>> treeItems)
         {
             //Find all this nodes children
             var nodeChildren = treeItems.Where(c => c.ParentKey == treeItem.Key).ToList();
@@ -268,7 +269,7 @@ namespace equiavia.components.Library.TreeView
 
         }
 
-        protected TValue FindObjectFromDatasource(EqTreeItem treeItem)
+        protected TValue FindObjectFromDatasource(EqTreeItem<TValue> treeItem)
         {
             if (treeItem == null)
             {
@@ -285,7 +286,7 @@ namespace equiavia.components.Library.TreeView
             return default(TValue);
         }
 
-        protected EqTreeItem FindTreeItem(string key)
+        protected EqTreeItem<TValue> FindTreeItem(string key)
         {
             foreach (var treeItem in _treeItems)
             {
@@ -297,14 +298,14 @@ namespace equiavia.components.Library.TreeView
             return null;
         }
 
-        protected List<EqTreeItem> FindAllTreeItemChildren(EqTreeItem item)
+        protected List<EqTreeItem<TValue>> FindAllTreeItemChildren(EqTreeItem<TValue> item)
         {
-            var childrenList = new List<EqTreeItem>();
+            var childrenList = new List<EqTreeItem<TValue>>();
 
             return TraverseChildren(item, childrenList);
         }
 
-        protected void FilterTreeItems(List<EqTreeItem> matchedItems)
+        protected void FilterTreeItems(List<EqTreeItem<TValue>> matchedItems)
         {
             foreach (var item in _treeItems)
             {
@@ -324,7 +325,7 @@ namespace equiavia.components.Library.TreeView
             }
         }
 
-        protected List<EqTreeItem> TraverseChildren(EqTreeItem item, List<EqTreeItem> childrenList)
+        protected List<EqTreeItem<TValue>> TraverseChildren(EqTreeItem<TValue> item, List<EqTreeItem<TValue>> childrenList)
         {
             if (item.HasChildren)
             {
@@ -339,24 +340,25 @@ namespace equiavia.components.Library.TreeView
             return childrenList;
         }
 
-        protected EqTreeItem FindTreeItem(TValue item)
+        protected EqTreeItem<TValue> FindTreeItem(TValue item)
         {
             var keyToSearchFor = item.GetPropValue(KeyPropertyName);
             //        var treeItem = _treeItems.FirstOrDefault(o => (item.GetPropValue(KeyPropertyName) as string) == o.Key);
             return FindTreeItem(keyToSearchFor?.ToString());
         }
 
-        protected EqTreeItem CreateTreeItem(TValue item)
+        protected EqTreeItem<TValue> CreateTreeItem(TValue item)
         {
-            return new EqTreeItem
+            return new EqTreeItem<TValue>
             {
                 Key = item.GetPropValue(KeyPropertyName)?.ToString(),
                 ParentKey = item.GetPropValue(ParentKeyPropertyName)?.ToString(),
                 Label = item.GetPropValue(ValuePropertyName)?.ToString(),
+                Data = item
             };
         }
 
-        protected void SetTreeItemParent(EqTreeItem treeItem, string newParentKey, string currentParentkey = null)
+        protected void SetTreeItemParent(EqTreeItem<TValue> treeItem, string newParentKey, string currentParentkey = null)
         {
             if (currentParentkey == newParentKey)
             {
@@ -382,7 +384,7 @@ namespace equiavia.components.Library.TreeView
             treeItem.Parent.AddChild(treeItem);
         }
 
-        protected static void DelinkTreeItemFromParent(EqTreeItem treeItem)
+        protected static void DelinkTreeItemFromParent(EqTreeItem<TValue> treeItem)
         {
             if (!treeItem.IsRootNode)
             {

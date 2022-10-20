@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace equiavia.components.Library.TreeView
 {
-    public class EqTreeItem
+    public class EqTreeItem<TValue>
     {
         public string Key { get; set; }
         public string ParentKey { get; set; }
@@ -14,9 +14,10 @@ namespace equiavia.components.Library.TreeView
         public bool IsDisabled { get; set; }
         public Guid UniqueIdentifier { get; internal set; }
         public int Level { get; internal set; } = 0;
-        public List<EqTreeItem> Children { get; internal set; }
-        public EqTreeItem Parent { get; internal set; }
+        public List<EqTreeItem<TValue>> Children { get; internal set; }
+        public EqTreeItem<TValue> Parent { get; internal set; }
         public object eqTreeViewItem { get; set; }
+        public TValue Data { get; set; }
         public bool IsRootNode
         {
             get
@@ -38,18 +39,18 @@ namespace equiavia.components.Library.TreeView
             UniqueIdentifier = Guid.NewGuid();
         }
 
-        public void AddParent(EqTreeItem parent)
+        public void AddParent(EqTreeItem<TValue> parent)
         {
             Parent = parent;
             Level++;
             IncrementChildrenLevel();
         }
 
-        public void AddChild(EqTreeItem child)
+        public void AddChild(EqTreeItem<TValue> child)
         {
             if (Children == null)
             {
-                Children = new List<EqTreeItem>();
+                Children = new List<EqTreeItem<TValue>>();
             }
             Children.Add(child);
             child.Level = this.Level + 1;

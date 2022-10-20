@@ -48,3 +48,15 @@ a, .btn-link {
         right: 0.75rem;
         top: 0.5rem;
     }
+
+.new-item {
+    margin-bottom: 3px;
+    margin-top: 3px;
+    padding: 10px 15px;
+    border: 1px solid #000000;
+    cursor: pointer;
+    color: white;
+    background-color: orange;
+    border-radius: 5px;
+    width: 300px;
+}

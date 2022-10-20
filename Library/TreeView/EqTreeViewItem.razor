@@ -36,6 +36,7 @@
 							ValuePropertyName="@ValuePropertyName"
 							@key="@child.UniqueIdentifier"
 							SelectedCSSClass="@SelectedCSSClass"
+							ItemCSSClass="@ItemCSSClass"
 							OnItemSelected="@OnItemSelected"
 							OnItemDoubleClicked="@OnItemDoubleClicked"
 							OnItemRightClicked="@OnItemRightClicked"
@@ -51,12 +52,12 @@
 	[CascadingParameter] public EqTreeView<TValue> EqTreeView { get; set; }
 	[Parameter] public string KeyPropertyName { get; set; } = "Id";
 	[Parameter] public string ValuePropertyName { get; set; } = "Name";
-	[Parameter] public EqTreeItem Item { get; set; }
-	[Parameter] public EventCallback<EqTreeItem> OnItemSelected { get; set; }
-	[Parameter] public EventCallback<EqTreeItem> OnItemDoubleClicked { get; set; }
-	[Parameter] public EventCallback<EqTreeItem> OnItemRightClicked { get; set; } 
+	[Parameter] public EqTreeItem<TValue> Item { get; set; }
+	[Parameter] public EventCallback<EqTreeItem<TValue>> OnItemSelected { get; set; }
+	[Parameter] public EventCallback<EqTreeItem<TValue>> OnItemDoubleClicked { get; set; }
+	[Parameter] public EventCallback<EqTreeItem<TValue>> OnItemRightClicked { get; set; }
 	[Parameter] public bool CompactView { get; set; } = false;
-	[Parameter] public RenderFragment<EqTreeItem> ItemTemplate { get; set; }
+	[Parameter] public RenderFragment<EqTreeItem<TValue>> ItemTemplate { get; set; }
 	[Parameter] public string SelectedCSSClass { get; set; } = "selected-item";
 	[Parameter] public string ItemCSSClass { get; set; } = "item";
 
@@ -88,13 +89,13 @@
 		Item.IsExpanded = !Item.IsExpanded;
 	}
 
-	private async ValueTask<ItemsProviderResult<EqTreeItem>> LoadItemChildren(ItemsProviderRequest request)
+	private async ValueTask<ItemsProviderResult<EqTreeItem<TValue>>> LoadItemChildren(ItemsProviderRequest request)
 	{
 		var children = Item.Children.Where(i => i.IsVisible);
 
-		return new ItemsProviderResult<EqTreeItem>(
+		return new ItemsProviderResult<EqTreeItem<TValue>>(
 			children.Skip(request.StartIndex).Take(request.Count),
-			children.Count<EqTreeItem>());
+			children.Count<EqTreeItem<TValue>>());
 	}
 
 	public void Refresh()
