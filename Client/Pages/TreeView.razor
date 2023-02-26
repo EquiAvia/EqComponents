@@ -25,15 +25,11 @@
 				</div>
 			</NoRecordsFoundTemplate>
 			<ItemTemplate Context="Item">
-				@if (Item.IsSelected)
-				{
-					<span>Selected - </span>@Item.Label
-				}
-				else
-				{
 					@Item.Label
-				}
 			</ItemTemplate>
+			<SelectedItemTemplate Context="Item">
+				<span>Selected - </span> @Item.Label
+			</SelectedItemTemplate>
 		</EqTreeView>
 	</div>
 	<div class="col">

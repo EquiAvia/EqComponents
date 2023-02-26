@@ -20,6 +20,9 @@
 			{
 				@Item.Label
 			}
+		} else if (SelectedItemTemplate != null && Item.IsSelected) 
+		{
+			@SelectedItemTemplate.Invoke(Item);
 		}
 		else
 		{
@@ -41,6 +44,7 @@
 							OnItemDoubleClicked="@OnItemDoubleClicked"
 							OnItemRightClicked="@OnItemRightClicked"
 							ItemTemplate="@ItemTemplate"
+							SelectedItemTemplate="@SelectedItemTemplate"
 							CompactView="@CompactView"></EqTreeViewItem>
 				</Virtualize>
 			</ul>
@@ -58,6 +62,7 @@
 	[Parameter] public EventCallback<EqTreeItem<TValue>> OnItemRightClicked { get; set; }
 	[Parameter] public bool CompactView { get; set; } = false;
 	[Parameter] public RenderFragment<EqTreeItem<TValue>> ItemTemplate { get; set; }
+	[Parameter] public RenderFragment<EqTreeItem<TValue>> SelectedItemTemplate { get; set; }
 	[Parameter] public string SelectedCSSClass { get; set; } = "selected-item";
 	[Parameter] public string ItemCSSClass { get; set; } = "item";
 

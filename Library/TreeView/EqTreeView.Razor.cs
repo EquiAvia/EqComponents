@@ -18,6 +18,7 @@ namespace equiavia.components.Library.TreeView
         [Parameter] public string ItemCSSClass { get; set; } = "item";
         [Parameter] public RenderFragment NoRecordsFoundTemplate { get; set; }
         [Parameter] public RenderFragment<EqTreeItem<TValue>> ItemTemplate { get; set; }
+        [Parameter] public RenderFragment<EqTreeItem<TValue>> SelectedItemTemplate { get; set; }
         [Parameter] public EventCallback<TValue> OnItemSelected { get; set; }
         [Parameter] public EventCallback<TValue> OnItemDoubleClicked { get; set; }
         [Parameter] public EventCallback<TValue> OnItemRightClicked { get; set; }
@@ -57,7 +58,7 @@ namespace equiavia.components.Library.TreeView
             var newItem = CreateTreeItem(Item);
             if (!String.IsNullOrEmpty(newItem.ParentKey))
             {
-                SetTreeItemParent(newItem,newItem.ParentKey,null);
+                SetTreeItemParent(newItem, newItem.ParentKey, null);
             }
             _treeItems.Add(newItem);
             await NotifyDatasourceChanged();
@@ -122,7 +123,7 @@ namespace equiavia.components.Library.TreeView
             if (caseSensitive)
             {
                 matchedItems = _treeItems.Where(i => i.Label.Contains(searchTerm)).ToList();
-               
+
             }
             else
             {
