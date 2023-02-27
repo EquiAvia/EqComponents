@@ -6,7 +6,7 @@
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
     <PackageId>equiavia.components.Library</PackageId>
-    <Version>6.2.0</Version>
+    <Version>6.3.0</Version>
     <Authors>Basil Buwalda</Authors>
     <Company>EQUIAVIA Ltd.</Company>
     <Product>EqComponents</Product>
@@ -26,7 +26,7 @@ These components are still in pre-release.</Description>
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="6.0.8" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="6.0.14" />
   </ItemGroup>
 
   <ItemGroup>
