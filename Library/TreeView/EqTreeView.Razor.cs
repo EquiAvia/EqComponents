@@ -120,7 +120,11 @@ namespace equiavia.components.Library.TreeView
         public void Filter(string searchTerm, bool caseSensitive = false)
         {
             List<EqTreeItem<TValue>> matchedItems = null;
-            if (caseSensitive)
+            if (String.IsNullOrEmpty(searchTerm))
+            {
+                matchedItems = _treeItems.ToList();
+            }
+            else if (caseSensitive)
             {
                 matchedItems = _treeItems.Where(i => i.Label.Contains(searchTerm)).ToList();
 
