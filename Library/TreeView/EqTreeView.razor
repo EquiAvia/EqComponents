@@ -1,13 +1,13 @@
 ﻿@typeparam TValue
 @using equiavia.components.Utilities
+@using Microsoft.AspNetCore.Components.Web.Virtualization
 
 @if (_treeItems != null)
 {
     <CascadingValue TValue="EqTreeView<TValue>" Value="@this">
         <div class="treeview-container" style="max-height:@Height;">
             <ul class="noselect">
-                @foreach (var item in _treeItems.Where(i => i.IsRootNode && i.IsVisible).Take(MaxNumOfRootNodesToDisplay).ToList())
-                {
+                <Virtualize TItem="EqTreeItem<TValue>" Items="@_treeItems?.Where(i => i.IsRootNode && i.IsVisible).ToList()" Context="item">
                     <EqTreeViewItem TValue=@TValue
                                     @ref="@item.eqTreeViewItem"
                                     Item="@item"
@@ -22,7 +22,7 @@
                                     ItemTemplate="@ItemTemplate"
                                     SelectedItemTemplate="@SelectedItemTemplate"
                                     CompactView="@CompactView"></EqTreeViewItem>
-                }
+                </Virtualize>
             </ul>
             @if (NoRecordsFoundTemplate!=null && !_treeItems.Where(i => i.IsVisible == true).Any())
             {

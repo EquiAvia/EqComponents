@@ -31,7 +31,7 @@
 		@if (Item.HasChildren && Item.IsExpanded)
 		{
 			<ul>
-				<Virtualize ItemsProvider="@LoadItemChildren" Context="child">
+				<Virtualize TItem="EqTreeItem<TValue>" Items="Item?.Children?.Where(i => i.IsVisible).ToList()" Context="child">
 					<EqTreeViewItem TValue=@TValue
 							@ref="@child.eqTreeViewItem"
 							Item="@child"
@@ -67,6 +67,11 @@
 	[Parameter] public string ItemCSSClass { get; set; } = "item";
 
 	protected string caretClass = "";
+
+	protected async override Task OnInitializedAsync()
+	{
+		await base.OnInitializedAsync();
+	}
 
 	protected async Task ItemSelected(MouseEventArgs args)
 	{

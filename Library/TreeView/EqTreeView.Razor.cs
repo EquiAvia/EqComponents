@@ -1,5 +1,6 @@
 ﻿using equiavia.components.Utilities;
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Web.Virtualization;
 using Microsoft.JSInterop;
 using System;
 using System.Collections.Generic;
@@ -38,7 +39,8 @@ namespace equiavia.components.Library.TreeView
             }
         }
         protected List<EqTreeItem<TValue>> _treeItems;
-        protected EqTreeItem<TValue> _selectedItem;
+		//protected List<EqTreeItem<TValue>> _rootNodes;
+		protected EqTreeItem<TValue> _selectedItem;
 
 
         #region Life Cycle Methods
@@ -47,7 +49,9 @@ namespace equiavia.components.Library.TreeView
             if (_treeItems == null)
             {
                 _treeItems = GenerateTreeItems(Datasource);
-            }
+                //_rootNodes = _treeItems?.Where(i => i.IsRootNode && i.IsVisible).ToList();
+
+			}
             return base.OnParametersSetAsync();
         }
         #endregion
@@ -150,6 +154,10 @@ namespace equiavia.components.Library.TreeView
         public async Task ShowItem(TValue item)
         {
             var treeItem = FindTreeItem(item);
+            if (treeItem == null)
+            {
+                return;
+            }
             ShowTreeItem(treeItem);
             await js.ScrollToElement($"EQ-{treeItem.UniqueIdentifier.ToString()}");
         }
