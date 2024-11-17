@@ -5,26 +5,24 @@
 @if (_treeItems != null)
 {
     <CascadingValue TValue="EqTreeView<TValue>" Value="@this">
-        <div class="treeview-container" id="@Id" style="max-height:@Height;">
-            <ul class="noselect">
-                <Virtualize TItem="EqTreeItem<TValue>" Items="@_treeItems?.Where(i => i.IsRootNode && i.IsVisible).ToList()" Context="item">
-                    <EqTreeViewItem TValue=@TValue
-                                    @ref="@item.eqTreeViewItem"
-                                    Item="@item"
-                                    KeyPropertyName="@KeyPropertyName"
-                                    ValuePropertyName="@ValuePropertyName"
-                                    @key="item.UniqueIdentifier"
-                                    OnItemSelected="ItemSelected"
-                                    OnItemDoubleClicked="ItemDoubleClicked"
-                                    OnItemRightClicked="ItemRightClicked"
-                                    SelectedCSSClass="@SelectedCSSClass"
-                                    ItemCSSClass="@ItemCSSClass"
-                                    ItemTemplate="@ItemTemplate"
-                                    SelectedItemTemplate="@SelectedItemTemplate"
-                                    CompactView="@CompactView"></EqTreeViewItem>
-                </Virtualize>
-            </ul>
-            @if (NoRecordsFoundTemplate!=null && !_treeItems.Where(i => i.IsVisible == true).Any())
+        <div class="treeview-container noselect @CSSClasses" id="@Id" style="max-height:@Height;@AdditionalStyles">
+            <Virtualize TItem="EqTreeItem<TValue>" Items="@_treeItems?.Where(i => i.IsRootNode && i.IsVisible).ToList()" Context="item">
+                <EqTreeViewItem TValue=@TValue
+                                @ref="@item.eqTreeViewItem"
+                                Item="@item"
+                                KeyPropertyName="@KeyPropertyName"
+                                ValuePropertyName="@ValuePropertyName"
+                                @key="item.UniqueIdentifier"
+                                OnItemSelected="ItemSelected"
+                                OnItemDoubleClicked="ItemDoubleClicked"
+                                OnItemRightClicked="ItemRightClicked"
+                                SelectedCSSClass="@SelectedCSSClass"
+                                ItemCSSClass="@ItemCSSClass"
+                                ItemTemplate="@ItemTemplate"
+                                SelectedItemTemplate="@SelectedItemTemplate"
+                                CompactView="@CompactView"></EqTreeViewItem>
+            </Virtualize>
+            @if (NoRecordsFoundTemplate != null && !_treeItems.Where(i => i.IsVisible == true).Any())
             {
                 @NoRecordsFoundTemplate
             }

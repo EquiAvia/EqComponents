@@ -12,6 +12,8 @@ namespace equiavia.components.Library.TreeView
     public partial class EqTreeView<TValue>
     {
         [Parameter] public string Id { get; set; } = "treeview-container-id";
+        [Parameter] public string CSSClasses { get; set; }
+        [Parameter] public string AdditionalStyles { get; set; }
         [Parameter] public List<TValue> Datasource { get; set; } = new List<TValue>();
         [Parameter] public string KeyPropertyName { get; set; } = "Id";
         [Parameter] public string ValuePropertyName { get; set; } = "Name";

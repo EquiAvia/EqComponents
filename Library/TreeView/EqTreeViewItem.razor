@@ -1,6 +1,6 @@
 ﻿@using Microsoft.AspNetCore.Components.Web.Virtualization
 @typeparam TValue
-<li id="EQ-@Item.UniqueIdentifier" 
+<div id="EQ-@Item.UniqueIdentifier" 
 	@onclick='ItemSelected'					@onclick:stopPropagation="true" 
 	@ondblclick='ItemDoubleClicked'			@ondblclick:stopPropagation="true"
 	@oncontextmenu='ContextMenuRequested'	@oncontextmenu:preventDefault="true"	@oncontextmenu:stopPropagation="true"
@@ -50,7 +50,7 @@
 			</ul>
 		}
 	</div>
-</li>
+</div>
 
 @code {
 	[CascadingParameter] public EqTreeView<TValue> EqTreeView { get; set; }

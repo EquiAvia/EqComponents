@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>net9.0</TargetFramework>
-    <Version>9.0.0</Version>
+    <Version>9.0.1</Version>
     <Company>EQUIAVIA Ltd.</Company>
     <Authors>Basil Buwalda</Authors>
     <Description>A set of extension methods for c# classes</Description>
