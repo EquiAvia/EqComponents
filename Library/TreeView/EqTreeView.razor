@@ -5,7 +5,7 @@
 @if (_treeItems != null)
 {
     <CascadingValue TValue="EqTreeView<TValue>" Value="@this">
-        <div class="treeview-container" style="max-height:@Height;">
+        <div class="treeview-container" id="@Id" style="max-height:@Height;">
             <ul class="noselect">
                 <Virtualize TItem="EqTreeItem<TValue>" Items="@_treeItems?.Where(i => i.IsRootNode && i.IsVisible).ToList()" Context="item">
                     <EqTreeViewItem TValue=@TValue
