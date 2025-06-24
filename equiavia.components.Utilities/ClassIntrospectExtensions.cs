@@ -65,7 +65,7 @@ namespace equiavia.components.Utilities
             }
             else
             {
-                Console.WriteLine(obj.GetType().Name + "does not have a propoerty called " + name + ". Could not set the value.");
+                Console.WriteLine(obj.GetType().Name + "does not have a property called " + name + ". Could not set the value.");
             }
         }
     }
