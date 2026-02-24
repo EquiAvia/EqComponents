@@ -7,10 +7,11 @@
 <h1>Tree View </h1>
 <div class="row">
 	<div class="col">
-		<EqTreeView 
-			@ref="treeView" 
-			Height="300px" 
-			TValue="Employee" 
+		<EqTreeView
+			@ref="treeView"
+			Height="@treeViewHeight"
+			CompactView="@compactView"
+			TValue="Employee"
 			@bind-Datasource="employees" 
 			ValuePropertyName="Name" 
 			OnItemsRemoved="ItemsRemoved" 
@@ -112,7 +113,7 @@
 				<div class="row">
 					<div class="col">
 						<b>Tree View Height</b>
-						<InputText @bind-Value="@treeView.Height"></InputText>
+						<InputText @bind-Value="@treeViewHeight"></InputText>
 					</div>
 				</div>
 				<div class="row">
@@ -131,7 +132,7 @@
 				<div class="row">
 					<div class="col">
 						<b>Compact View</b>
-						<InputCheckbox @bind-Value="@treeView.CompactView" />
+						<InputCheckbox @bind-Value="@compactView" />
 					</div>
 				</div>
 			</EditForm>
@@ -181,6 +182,8 @@
 	private List<String> eventsFired = new();
 	private EqTreeView<Employee> treeView;
 	private bool caseSensitiveSearch;
+	private string treeViewHeight = "300px";
+	private bool compactView;
 
 	protected override async Task OnInitializedAsync()
 	{
