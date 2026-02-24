@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net9.0</TargetFramework>
-    <Version>9.0.1</Version>
+    <TargetFramework>net10.0</TargetFramework>
+    <Version>10.0.1</Version>
     <Company>EQUIAVIA Ltd.</Company>
     <Authors>Basil Buwalda</Authors>
     <Description>A set of extension methods for c# classes</Description>
@@ -13,6 +13,6 @@
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="9.0.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="10.0.0" />
   </ItemGroup>
 </Project>
