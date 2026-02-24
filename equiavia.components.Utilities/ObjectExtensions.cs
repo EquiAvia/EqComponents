@@ -11,6 +11,7 @@ namespace equiavia.components.Utilities
 
         public static void ShallowCopyPropertiesTo(this Object obj, object target)
         {
+            if (target == null) return;
             var fromProperties = obj.GetType().GetProperties();
             var toProperties = target.GetType().GetProperties();
 
@@ -29,6 +30,7 @@ namespace equiavia.components.Utilities
 
         public static void ShallowCopyPropertiesFrom(this Object obj, object source)
         {
+            if (source == null) return;
             var fromProperties = source.GetType().GetProperties();
             var toProperties = obj.GetType().GetProperties();
 

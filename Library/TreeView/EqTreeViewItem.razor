@@ -66,8 +66,6 @@
 	[Parameter] public string SelectedCSSClass { get; set; } = "selected-item";
 	[Parameter] public string ItemCSSClass { get; set; } = "item";
 
-	protected string caretClass = "";
-
 	protected async override Task OnInitializedAsync()
 	{
 		await base.OnInitializedAsync();
@@ -97,15 +95,6 @@
 	protected void ToggleExpand(MouseEventArgs args)
 	{
 		Item.IsExpanded = !Item.IsExpanded;
-	}
-
-	private async ValueTask<ItemsProviderResult<EqTreeItem<TValue>>> LoadItemChildren(ItemsProviderRequest request)
-	{
-		var children = Item.Children.Where(i => i.IsVisible);
-
-		return new ItemsProviderResult<EqTreeItem<TValue>>(
-			children.Skip(request.StartIndex).Take(request.Count),
-			children.Count<EqTreeItem<TValue>>());
 	}
 
 	public void Refresh()

@@ -126,6 +126,8 @@ namespace equiavia.components.Library.TreeView
 
         public void Filter(string searchTerm, bool caseSensitive = false)
         {
+            if (_treeItems == null) return;
+
             List<EqTreeItem<TValue>> matchedItems = null;
             if (String.IsNullOrEmpty(searchTerm))
             {
@@ -133,12 +135,12 @@ namespace equiavia.components.Library.TreeView
             }
             else if (caseSensitive)
             {
-                matchedItems = _treeItems.Where(i => i.Label.Contains(searchTerm)).ToList();
+                matchedItems = _treeItems.Where(i => i.Label?.Contains(searchTerm) == true).ToList();
 
             }
             else
             {
-                matchedItems = _treeItems.Where(i => i.Label.ToLower().Contains(searchTerm.ToLower())).ToList();
+                matchedItems = _treeItems.Where(i => i.Label?.ToLower().Contains(searchTerm.ToLower()) == true).ToList();
             }
 
             FilterTreeItems(matchedItems);
@@ -166,19 +168,19 @@ namespace equiavia.components.Library.TreeView
         }
         public void ExpandAll()
         {
+            if (_treeItems == null) return;
             foreach (var treeItem in _treeItems)
             {
                 treeItem.IsExpanded = true;
             }
-            Console.WriteLine("Expand All");
         }
         public void CollapseAll()
         {
+            if (_treeItems == null) return;
             foreach (var treeItem in _treeItems)
             {
                 treeItem.IsExpanded = false;
             }
-            Console.WriteLine("Collapse All");
         }
         public async Task Refresh(List<TValue> newDatasource)
         {
@@ -304,6 +306,7 @@ namespace equiavia.components.Library.TreeView
 
         protected EqTreeItem<TValue> FindTreeItem(string key)
         {
+            if (_treeItems == null) return null;
             foreach (var treeItem in _treeItems)
             {
                 if (treeItem.Key == key)
@@ -317,8 +320,9 @@ namespace equiavia.components.Library.TreeView
         protected List<EqTreeItem<TValue>> FindAllTreeItemChildren(EqTreeItem<TValue> item)
         {
             var childrenList = new List<EqTreeItem<TValue>>();
+            var visited = new HashSet<EqTreeItem<TValue>>();
 
-            return TraverseChildren(item, childrenList);
+            return TraverseChildren(item, childrenList, visited);
         }
 
         protected void FilterTreeItems(List<EqTreeItem<TValue>> matchedItems)
@@ -341,13 +345,18 @@ namespace equiavia.components.Library.TreeView
             }
         }
 
-        protected List<EqTreeItem<TValue>> TraverseChildren(EqTreeItem<TValue> item, List<EqTreeItem<TValue>> childrenList)
+        protected List<EqTreeItem<TValue>> TraverseChildren(EqTreeItem<TValue> item, List<EqTreeItem<TValue>> childrenList, HashSet<EqTreeItem<TValue>> visited)
         {
+            if (!visited.Add(item))
+            {
+                return childrenList; // Cycle detected — skip this node
+            }
+
             if (item.HasChildren)
             {
                 foreach (var child in item.Children)
                 {
-                    TraverseChildren(child, childrenList);
+                    TraverseChildren(child, childrenList, visited);
                 }
             }
 
