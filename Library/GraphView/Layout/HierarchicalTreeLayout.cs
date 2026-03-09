@@ -95,7 +95,14 @@ namespace equiavia.components.Library.GraphView.Layout
 
             result.Nodes = positionedNodes.Values.ToList();
 
-            // Generate edge paths
+            // Apply direction transform BEFORE edge generation
+            if (options.Direction != LayoutDirection.TopToBottom)
+            {
+                TransformForDirection(result, options.Direction);
+                positionedNodes = result.Nodes.ToDictionary(n => n.Node.Id);
+            }
+
+            // Generate edge paths (uses transformed positions + direction-aware connection points)
             foreach (var edge in edges)
             {
                 if (positionedNodes.ContainsKey(edge.SourceNodeId) && positionedNodes.ContainsKey(edge.TargetNodeId))
@@ -169,6 +176,40 @@ namespace equiavia.components.Library.GraphView.Layout
         private static NodeShape ResolveShape(NodeShape shape)
         {
             return shape == NodeShape.Auto ? NodeShape.RoundedRectangle : shape;
+        }
+
+        private static void TransformForDirection(LayoutResult result, LayoutDirection direction)
+        {
+            double maxX = result.Nodes.Max(n => n.X + n.Width);
+            double maxY = result.Nodes.Max(n => n.Y + n.Height);
+
+            switch (direction)
+            {
+                case LayoutDirection.BottomToTop:
+                    foreach (var node in result.Nodes)
+                        node.Y = maxY - node.Y - node.Height;
+                    break;
+
+                case LayoutDirection.LeftToRight:
+                    foreach (var node in result.Nodes)
+                    {
+                        (node.X, node.Y) = (node.Y, node.X);
+                        (node.Width, node.Height) = (node.Height, node.Width);
+                    }
+                    break;
+
+                case LayoutDirection.RightToLeft:
+                    double swappedMaxX = maxY;
+                    foreach (var node in result.Nodes)
+                    {
+                        double newX = node.Y;
+                        double newY = node.X;
+                        (node.Width, node.Height) = (node.Height, node.Width);
+                        node.X = swappedMaxX - newX - node.Width;
+                        node.Y = newY;
+                    }
+                    break;
+            }
         }
 
         internal static EdgePath BuildEdgePath(PositionedNode source, PositionedNode target, GraphEdge edge, GraphLayoutOptions options)
