@@ -72,6 +72,7 @@
                                      IsFocused="@(node.Node.Id == _focusedNodeId)"
                                      IsPerformanceMode="@_isPerformanceMode"
                                      OnClick="HandleNodeClick"
+                                     OnDoubleClick="HandleNodeDoubleClick"
                                      OnContextMenu="HandleNodeContextMenu"
                                      ElementId="@($"{Id}-node-{node.Node.Id}")"
                                      @key="node.Node.Id" />

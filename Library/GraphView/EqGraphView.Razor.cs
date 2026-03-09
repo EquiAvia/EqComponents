@@ -279,6 +279,21 @@ namespace equiavia.components.Library.GraphView
             await OnNodeSelected.InvokeAsync(node);
         }
 
+        private async Task HandleNodeDoubleClick(GraphNode node)
+        {
+            if (_jsInitialized)
+            {
+                try
+                {
+                    await JsInterop.ZoomToNode($"{Id}-node-{node.Id}");
+                }
+                catch (JSDisconnectedException)
+                {
+                    // Circuit disconnected, safe to ignore
+                }
+            }
+        }
+
         private void HandleNodeContextMenu((GraphNode Node, MouseEventArgs Args) tuple)
         {
             _contextMenuNode = tuple.Node;

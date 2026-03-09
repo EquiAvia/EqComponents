@@ -47,6 +47,13 @@ namespace equiavia.components.Library.GraphView
             return await module.InvokeAsync<bool>("scrollToNode", _svgId, nodeElementId);
         }
 
+        public async Task ZoomToNode(string nodeElementId, double targetScale = 1.5)
+        {
+            if (_svgId == null) return;
+            var module = await _moduleTask.Value;
+            await module.InvokeVoidAsync("zoomToNode", _svgId, nodeElementId, targetScale);
+        }
+
         [JSInvokable]
         public async Task HandleLongPress(string nodeId, double clientX, double clientY)
         {

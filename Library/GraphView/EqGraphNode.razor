@@ -12,6 +12,8 @@
    tabindex="@(IsFocused ? 0 : -1)"
    id="@ElementId"
    @onclick="HandleClick"
+   @ondblclick="HandleDoubleClick"
+   @ondblclick:stopPropagation="true"
    @oncontextmenu="HandleContextMenu"
    @oncontextmenu:preventDefault="true">
 
@@ -81,6 +83,7 @@
     [Parameter] public bool IsFocused { get; set; }
     [Parameter] public bool IsPerformanceMode { get; set; }
     [Parameter] public EventCallback<GraphNode> OnClick { get; set; }
+    [Parameter] public EventCallback<GraphNode> OnDoubleClick { get; set; }
     [Parameter] public EventCallback<(GraphNode, MouseEventArgs)> OnContextMenu { get; set; }
     [Parameter] public string ElementId { get; set; } = string.Empty;
 
@@ -109,6 +112,11 @@
     private async Task HandleClick()
     {
         await OnClick.InvokeAsync(PositionedNode.Node);
+    }
+
+    private async Task HandleDoubleClick()
+    {
+        await OnDoubleClick.InvokeAsync(PositionedNode.Node);
     }
 
     private async Task HandleContextMenu(MouseEventArgs args)

@@ -319,6 +319,43 @@ export function scrollToNode(svgId, nodeElementId) {
     return true;
 }
 
+export function zoomToNode(svgId, nodeElementId, targetScale) {
+    const state = instances.get(svgId);
+    if (!state) return false;
+
+    const nodeEl = document.getElementById(nodeElementId);
+    if (!nodeEl) return false;
+
+    const rect = state.svgEl.getBoundingClientRect();
+    const viewWidth = rect.width;
+    const viewHeight = rect.height;
+
+    // Node position comes from its SVG transform attribute
+    const transformAttr = nodeEl.getAttribute('transform');
+    if (!transformAttr) return false;
+
+    const match = transformAttr.match(/translate\(([^,]+),([^)]+)\)/);
+    if (!match) return false;
+
+    const nodeX = parseFloat(match[1]);
+    const nodeY = parseFloat(match[2]);
+
+    // Read actual node dimensions from the SVG bounding box
+    let nodeW = 120, nodeH = 60;
+    try {
+        const bbox = nodeEl.getBBox();
+        nodeW = bbox.width;
+        nodeH = bbox.height;
+    } catch (e) { /* getBBox not available (e.g. not yet rendered) */ }
+
+    const scale = Math.max(state.minZoom, Math.min(state.maxZoom, targetScale || 1.5));
+    const tx = viewWidth / 2 - (nodeX + nodeW / 2) * scale;
+    const ty = viewHeight / 2 - (nodeY + nodeH / 2) * scale;
+
+    animateToTransform(state, tx, ty, scale, 350);
+    return true;
+}
+
 export function dispose(svgId) {
     const state = instances.get(svgId);
     if (!state) return;
