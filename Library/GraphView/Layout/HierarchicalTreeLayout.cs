@@ -284,21 +284,29 @@ namespace equiavia.components.Library.GraphView.Layout
 
         private static string BuildBezierPath(double startX, double startY, double endX, double endY, LayoutDirection direction)
         {
+            // Control handles at 1/3 of the span keep each end's tangent perpendicular
+            // to the node edge while avoiding the wide belly produced by midpoint handles.
             bool isVertical = direction == LayoutDirection.TopToBottom || direction == LayoutDirection.BottomToTop;
 
             if (isVertical)
             {
-                double midY = (startY + endY) / 2;
+                double cp = (endY - startY) / 3;
                 return string.Format(CultureInfo.InvariantCulture,
-                    "M {0},{1} C {0},{2} {3},{2} {3},{4}",
-                    startX, startY, midY, endX, endY);
+                    "M {0},{1} C {0},{2} {3},{4} {3},{5}",
+                    startX, startY,
+                    startY + cp,
+                    endX, endY - cp,
+                    endY);
             }
             else
             {
-                double midX = (startX + endX) / 2;
+                double cp = (endX - startX) / 3;
                 return string.Format(CultureInfo.InvariantCulture,
-                    "M {0},{1} C {2},{1} {2},{3} {4},{3}",
-                    startX, startY, midX, endY, endX);
+                    "M {0},{1} C {2},{1} {3},{4} {5},{4}",
+                    startX, startY,
+                    startX + cp,
+                    endX - cp, endY,
+                    endX);
             }
         }
 
