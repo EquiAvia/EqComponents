@@ -135,22 +135,6 @@ namespace equiavia.components.Library.GraphView
             }
         }
 
-        public async Task ExpandAll()
-        {
-            _currentRootNodeId = null;
-            _breadcrumbPath.Clear();
-            await RunLayout();
-            StateHasChanged();
-        }
-
-        public async Task CollapseAll()
-        {
-            _currentRootNodeId = null;
-            _breadcrumbPath.Clear();
-            await RunLayout();
-            StateHasChanged();
-        }
-
         public async Task NavigateToRoot()
         {
             _currentRootNodeId = null;
