@@ -15,7 +15,7 @@ These components are still in pre-release.</Description>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageProjectUrl>https://github.com/EquiAvia/EqComponents</PackageProjectUrl>
     <RepositoryUrl>https://github.com/EquiAvia/EqComponents</RepositoryUrl>
-    <PackageTags>Treeview, Blazor, .net10</PackageTags>
+    <PackageTags>Treeview, GraphView, Blazor, .net10</PackageTags>
     <NeutralLanguage>en-NZ</NeutralLanguage>
   </PropertyGroup>
   <ItemGroup>
