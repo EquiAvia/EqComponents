@@ -354,6 +354,80 @@ namespace equiavia.components.Library.GraphView
                                 : null);
                     }
                     break;
+
+                case "ArrowDown":
+                {
+                    var (_, childrenMap, rootIds) = BuildNavigationMaps();
+                    if (string.IsNullOrEmpty(_focusedNodeId))
+                    {
+                        if (rootIds.Count > 0) _focusedNodeId = rootIds[0];
+                    }
+                    else if (childrenMap.TryGetValue(_focusedNodeId, out var children) && children.Count > 0)
+                    {
+                        _focusedNodeId = children[0];
+                    }
+                    break;
+                }
+
+                case "ArrowUp":
+                {
+                    var (parentMap, _, _) = BuildNavigationMaps();
+                    if (!string.IsNullOrEmpty(_focusedNodeId) && parentMap.TryGetValue(_focusedNodeId, out var parentId))
+                    {
+                        _focusedNodeId = parentId;
+                    }
+                    break;
+                }
+
+                case "ArrowRight":
+                {
+                    var (parentMap, childrenMap, rootIds) = BuildNavigationMaps();
+                    if (!string.IsNullOrEmpty(_focusedNodeId))
+                    {
+                        List<string> siblings;
+                        if (parentMap.TryGetValue(_focusedNodeId, out var parentId))
+                            siblings = childrenMap[parentId];
+                        else
+                            siblings = rootIds;
+
+                        int index = siblings.IndexOf(_focusedNodeId);
+                        if (index >= 0 && index < siblings.Count - 1)
+                            _focusedNodeId = siblings[index + 1];
+                    }
+                    break;
+                }
+
+                case "ArrowLeft":
+                {
+                    var (parentMap, childrenMap, rootIds) = BuildNavigationMaps();
+                    if (!string.IsNullOrEmpty(_focusedNodeId))
+                    {
+                        List<string> siblings;
+                        if (parentMap.TryGetValue(_focusedNodeId, out var parentId))
+                            siblings = childrenMap[parentId];
+                        else
+                            siblings = rootIds;
+
+                        int index = siblings.IndexOf(_focusedNodeId);
+                        if (index > 0)
+                            _focusedNodeId = siblings[index - 1];
+                    }
+                    break;
+                }
+
+                case "Home":
+                {
+                    var (_, _, rootIds) = BuildNavigationMaps();
+                    if (rootIds.Count > 0) _focusedNodeId = rootIds[0];
+                    break;
+                }
+
+                case "End":
+                {
+                    var (_, _, rootIds) = BuildNavigationMaps();
+                    if (rootIds.Count > 0) _focusedNodeId = rootIds[rootIds.Count - 1];
+                    break;
+                }
             }
         }
 
@@ -415,6 +489,37 @@ namespace equiavia.components.Library.GraphView
             }
 
             return result;
+        }
+
+        private (Dictionary<string, string> parentMap, Dictionary<string, List<string>> childrenMap, List<string> rootIds) BuildNavigationMaps()
+        {
+            var parentMap = new Dictionary<string, string>();
+            var childrenMap = new Dictionary<string, List<string>>();
+            var incomingSet = new HashSet<string>();
+
+            if (_sanitizedData == null)
+                return (parentMap, childrenMap, new List<string>());
+
+            foreach (var node in _sanitizedData.Nodes)
+                childrenMap[node.Id] = new List<string>();
+
+            foreach (var edge in _sanitizedData.Edges)
+            {
+                if (edge.Direction != EdgeDirection.Undirected
+                    && childrenMap.ContainsKey(edge.SourceNodeId))
+                {
+                    childrenMap[edge.SourceNodeId].Add(edge.TargetNodeId);
+                    parentMap[edge.TargetNodeId] = edge.SourceNodeId;
+                    incomingSet.Add(edge.TargetNodeId);
+                }
+            }
+
+            var rootIds = _sanitizedData.Nodes
+                .Where(n => !incomingSet.Contains(n.Id))
+                .Select(n => n.Id)
+                .ToList();
+
+            return (parentMap, childrenMap, rootIds);
         }
 
         private NodeShape GetResolvedShape(GraphNode node)
