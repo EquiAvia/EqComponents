@@ -311,17 +311,18 @@ namespace equiavia.components.Library.GraphView.Layout
 
         private static string BuildOrthogonalPath(double startX, double startY, double endX, double endY, LayoutDirection direction, double cornerRadius)
         {
-            // Reverse-L routing: first move perpendicular to align with child's
-            // column/row, then move parallel into the child. This ensures the
-            // arrowhead always points INTO the child node (down in TB, right in LR, etc.)
-            // and each parent→child edge is visually independent.
+            // 3-segment org-chart style connector:
+            //   1. Stem from parent to midpoint
+            //   2. Crossbar at midpoint to align with child
+            //   3. Drop from crossbar into child (arrowhead points into child)
             bool isVertical = direction == LayoutDirection.TopToBottom || direction == LayoutDirection.BottomToTop;
 
             if (isVertical)
             {
                 double dx = endX - startX;
+                double midY = (startY + endY) / 2;
 
-                // Straight vertical line if parent and child are aligned
+                // Straight vertical line if aligned
                 if (Math.Abs(dx) < 0.1)
                 {
                     return string.Format(CultureInfo.InvariantCulture,
@@ -329,32 +330,39 @@ namespace equiavia.components.Library.GraphView.Layout
                         startX, startY, endY);
                 }
 
-                // Horizontal to child's column, then vertical down to child
+                // 3 segments: vertical stem, horizontal crossbar, vertical drop
                 if (cornerRadius < 0.1)
                 {
                     return string.Format(CultureInfo.InvariantCulture,
-                        "M {0},{1} L {2},{1} L {2},{3}",
-                        startX, startY, endX, endY);
+                        "M {0},{1} L {0},{2} L {3},{2} L {3},{4}",
+                        startX, startY, midY, endX, endY);
                 }
 
-                double verticalDist = Math.Abs(endY - startY);
-                double r = Math.Min(cornerRadius, Math.Min(verticalDist, Math.Abs(dx)) / 2);
+                double halfVert = Math.Abs(midY - startY);
+                double r = Math.Min(cornerRadius, Math.Min(halfVert, Math.Abs(dx)) / 2);
                 double signX = dx > 0 ? 1 : -1;
                 double signY = endY > startY ? 1 : -1;
-                double sweep = (signX > 0 && signY > 0) || (signX < 0 && signY < 0) ? 0 : 1;
+                // First corner: vertical→horizontal
+                double sweep1 = (signY > 0 && signX > 0) || (signY < 0 && signX < 0) ? 1 : 0;
+                // Second corner: horizontal→vertical
+                double sweep2 = (signX > 0 && signY > 0) || (signX < 0 && signY < 0) ? 0 : 1;
 
                 return string.Format(CultureInfo.InvariantCulture,
-                    "M {0},{1} L {2},{1} A {3},{3} 0 0 {4} {5},{6} L {5},{7}",
+                    "M {0},{1} L {0},{2} A {3},{3} 0 0 {4} {5},{6} L {7},{6} A {3},{3} 0 0 {8} {9},{10} L {9},{11}",
                     startX, startY,
-                    endX - signX * r,
+                    midY - signY * r,
                     r,
-                    sweep,
-                    endX, startY + signY * r,
+                    sweep1,
+                    startX + signX * r, midY,
+                    endX - signX * r,
+                    sweep2,
+                    endX, midY + signY * r,
                     endY);
             }
             else
             {
                 double dy = endY - startY;
+                double midX = (startX + endX) / 2;
 
                 // Straight horizontal line if aligned
                 if (Math.Abs(dy) < 0.1)
@@ -364,27 +372,33 @@ namespace equiavia.components.Library.GraphView.Layout
                         startX, startY, endX);
                 }
 
-                // Vertical to child's row, then horizontal into child
+                // 3 segments: horizontal stem, vertical crossbar, horizontal drop
                 if (cornerRadius < 0.1)
                 {
                     return string.Format(CultureInfo.InvariantCulture,
-                        "M {0},{1} L {0},{3} L {2},{3}",
-                        startX, startY, endX, endY);
+                        "M {0},{1} L {2},{1} L {2},{3} L {4},{3}",
+                        startX, startY, midX, endY, endX);
                 }
 
-                double horizontalDist = Math.Abs(endX - startX);
-                double r = Math.Min(cornerRadius, Math.Min(horizontalDist, Math.Abs(dy)) / 2);
+                double halfHoriz = Math.Abs(midX - startX);
+                double r = Math.Min(cornerRadius, Math.Min(halfHoriz, Math.Abs(dy)) / 2);
                 double signX = endX > startX ? 1 : -1;
                 double signY = dy > 0 ? 1 : -1;
-                double sweep = (signY > 0 && signX > 0) || (signY < 0 && signX < 0) ? 1 : 0;
+                // First corner: horizontal→vertical
+                double sweep1 = (signX > 0 && signY > 0) || (signX < 0 && signY < 0) ? 0 : 1;
+                // Second corner: vertical→horizontal
+                double sweep2 = (signY > 0 && signX > 0) || (signY < 0 && signX < 0) ? 1 : 0;
 
                 return string.Format(CultureInfo.InvariantCulture,
-                    "M {0},{1} L {0},{2} A {3},{3} 0 0 {4} {5},{6} L {7},{6}",
+                    "M {0},{1} L {2},{1} A {3},{3} 0 0 {4} {5},{6} L {5},{7} A {3},{3} 0 0 {8} {9},{10} L {11},{10}",
                     startX, startY,
-                    endY - signY * r,
+                    midX - signX * r,
                     r,
-                    sweep,
-                    startX + signX * r, endY,
+                    sweep1,
+                    midX, startY + signY * r,
+                    endY - signY * r,
+                    sweep2,
+                    midX + signX * r, endY,
                     endX);
             }
         }
