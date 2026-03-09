@@ -1,0 +1,53 @@
+@using equiavia.components.Library.GraphView.Models
+@namespace equiavia.components.Library.GraphView
+
+@if (Path != null && Path.Count > 0)
+{
+    <nav aria-label="Graph breadcrumb" class="eq-graph-breadcrumb">
+        <ol class="eq-graph-breadcrumb-list">
+            <li class="eq-graph-breadcrumb-item">
+                <button type="button" class="eq-graph-breadcrumb-button" @onclick="HandleRootClick">Root</button>
+                <span class="eq-graph-breadcrumb-separator">/</span>
+            </li>
+            @for (var i = 0; i < Path.Count; i++)
+            {
+                var node = Path[i];
+                var isLast = i == Path.Count - 1;
+                <li class="eq-graph-breadcrumb-item">
+                    @if (isLast)
+                    {
+                        <span class="eq-graph-breadcrumb-current">@GetNodeLabel(node)</span>
+                    }
+                    else
+                    {
+                        var capturedNode = node;
+                        <button type="button" class="eq-graph-breadcrumb-button" @onclick="() => HandleNodeClick(capturedNode)">@GetNodeLabel(node)</button>
+                        <span class="eq-graph-breadcrumb-separator">/</span>
+                    }
+                </li>
+            }
+        </ol>
+    </nav>
+}
+
+@code {
+    [Parameter] public List<GraphNode> Path { get; set; } = new();
+#nullable enable
+    [Parameter] public EventCallback<GraphNode?> OnNavigate { get; set; }
+#nullable restore
+
+    private string GetNodeLabel(GraphNode node)
+    {
+        return !string.IsNullOrEmpty(node.Label) ? node.Label : node.Id;
+    }
+
+    private async Task HandleRootClick()
+    {
+        await OnNavigate.InvokeAsync(null);
+    }
+
+    private async Task HandleNodeClick(GraphNode node)
+    {
+        await OnNavigate.InvokeAsync(node);
+    }
+}

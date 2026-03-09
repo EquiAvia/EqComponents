@@ -1,0 +1,47 @@
+.eq-graph-breadcrumb {
+    padding: 6px 12px;
+    background-color: #f8f9fa;
+    border-bottom: 1px solid #dee2e6;
+}
+
+.eq-graph-breadcrumb-list {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    gap: 4px;
+}
+
+.eq-graph-breadcrumb-item {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.eq-graph-breadcrumb-button {
+    background: none;
+    border: none;
+    color: #0078d4;
+    cursor: pointer;
+    padding: 2px 4px;
+    border-radius: 3px;
+    font-size: 13px;
+}
+
+.eq-graph-breadcrumb-button:hover {
+    background-color: #e8e8e8;
+    text-decoration: underline;
+}
+
+.eq-graph-breadcrumb-separator {
+    color: #999;
+    font-size: 13px;
+}
+
+.eq-graph-breadcrumb-current {
+    font-size: 13px;
+    font-weight: 600;
+    color: #333;
+}
