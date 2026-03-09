@@ -36,7 +36,7 @@ namespace equiavia.components.Library.GraphView
         #region EventCallbacks
 
         [Parameter] public EventCallback<GraphNode> OnNodeSelected { get; set; }
-        [Parameter] public EventCallback<GraphContextAction> OnContextActionSelected { get; set; }
+        [Parameter] public EventCallback<(GraphNode Node, GraphContextAction Action)> OnContextActionSelected { get; set; }
         [Parameter] public EventCallback<GraphNode> OnBreadcrumbNavigated { get; set; }
         [Parameter] public EventCallback OnSelectionCleared { get; set; }
         [Parameter] public EventCallback<string> OnDataWarning { get; set; }
@@ -300,7 +300,7 @@ namespace equiavia.components.Library.GraphView
         private async Task HandleContextAction(GraphContextAction action)
         {
             _contextMenuVisible = false;
-            await OnContextActionSelected.InvokeAsync(action);
+            await OnContextActionSelected.InvokeAsync((_contextMenuNode, action));
         }
 
         private void DismissContextMenu()
