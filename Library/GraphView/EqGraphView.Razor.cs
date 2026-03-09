@@ -6,11 +6,14 @@ using equiavia.components.Library.GraphView.Layout;
 using equiavia.components.Library.GraphView.Models;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
+using Microsoft.JSInterop;
 
 namespace equiavia.components.Library.GraphView
 {
     public partial class EqGraphView : ComponentBase, IAsyncDisposable
     {
+        [Inject] public GraphViewJSInterop JsInterop { get; set; } = default!;
+
         #region Parameters
 
         [Parameter] public GraphData Data { get; set; }
@@ -56,6 +59,7 @@ namespace equiavia.components.Library.GraphView
         private double _contextMenuX;
         private double _contextMenuY;
         private GraphNode _contextMenuNode;
+        private bool _jsInitialized;
 
         #endregion
 
@@ -66,6 +70,7 @@ namespace equiavia.components.Library.GraphView
             if (!ReferenceEquals(Data, _previousData))
             {
                 _previousData = Data;
+                _jsInitialized = false;
                 await RunFullPipeline();
             }
             else if (SelectedNodeId != _activeSelectedNodeId)
@@ -74,27 +79,60 @@ namespace equiavia.components.Library.GraphView
             }
         }
 
+        protected override async Task OnAfterRenderAsync(bool firstRender)
+        {
+            if (_layoutResult != null && !_jsInitialized)
+            {
+                _jsInitialized = true;
+                JsInterop.OnLongPress = HandleLongPressFromJs;
+                try
+                {
+                    await JsInterop.Initialize(Id, $"{Id}-viewport", MinZoom, MaxZoom);
+                    await JsInterop.ZoomToFit(_layoutResult.TotalWidth, _layoutResult.TotalHeight);
+                }
+                catch (JSDisconnectedException)
+                {
+                    // Circuit disconnected, safe to ignore
+                }
+            }
+        }
+
         #endregion
 
         #region Public API
 
-        public void SetSelectedNode(string nodeId)
+        public async Task SetSelectedNode(string nodeId)
         {
             UpdateSelection(nodeId);
             StateHasChanged();
+            if (_jsInitialized && !string.IsNullOrEmpty(nodeId))
+            {
+                try
+                {
+                    await JsInterop.ScrollToNode($"{Id}-node-{nodeId}");
+                }
+                catch (JSDisconnectedException)
+                {
+                    // Circuit disconnected, safe to ignore
+                }
+            }
         }
 
         public async Task Refresh(GraphData data)
         {
             Data = data;
             _previousData = data;
+            _jsInitialized = false;
             await RunFullPipeline();
             StateHasChanged();
         }
 
-        public void ResetView()
+        public async Task ResetView()
         {
-            // Placeholder for Phase 4 JS interop
+            if (_layoutResult != null && _jsInitialized)
+            {
+                await JsInterop.ZoomToFit(_layoutResult.TotalWidth, _layoutResult.TotalHeight);
+            }
         }
 
         public async Task ExpandAll()
@@ -335,6 +373,19 @@ namespace equiavia.components.Library.GraphView
             }
         }
 
+        private async Task HandleLongPressFromJs(string nodeId, double clientX, double clientY)
+        {
+            if (_sanitizedData == null) return;
+            var node = _sanitizedData.Nodes.FirstOrDefault(n => n.Id == nodeId);
+            if (node == null) return;
+
+            _contextMenuNode = node;
+            _contextMenuX = clientX;
+            _contextMenuY = clientY;
+            _contextMenuVisible = true;
+            await InvokeAsync(StateHasChanged);
+        }
+
         #endregion
 
         #region Helpers
@@ -395,10 +446,19 @@ namespace equiavia.components.Library.GraphView
             }
         }
 
-        public ValueTask DisposeAsync()
+        public async ValueTask DisposeAsync()
         {
-            // Placeholder for Phase 4 JS interop disposal
-            return ValueTask.CompletedTask;
+            if (_jsInitialized)
+            {
+                try
+                {
+                    await JsInterop.DisposeAsync();
+                }
+                catch (JSDisconnectedException)
+                {
+                    // Circuit disconnected, safe to ignore
+                }
+            }
         }
 
         #endregion

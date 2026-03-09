@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using equiavia.components.Library.GraphView;
+using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,6 +13,7 @@ namespace equiavia.components.Library
         public static void Initialize(IServiceCollection services)
         {
             services.AddScoped<TreeViewJSInterop, TreeViewJSInterop>();
+            services.AddScoped<GraphViewJSInterop, GraphViewJSInterop>();
         }
     }
 }
