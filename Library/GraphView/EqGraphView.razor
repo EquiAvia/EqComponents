@@ -1,0 +1,98 @@
+@using equiavia.components.Library.GraphView.Layout
+@using equiavia.components.Library.GraphView.Models
+@using Microsoft.AspNetCore.Components.Web
+@namespace equiavia.components.Library.GraphView
+
+<div class="eq-graph-container @CSSClasses"
+     id="@Id"
+     style="height:@Height;@AdditionalStyles"
+     @onkeydown="HandleKeyDown">
+
+    <EqGraphBreadcrumb Path="@_breadcrumbPath"
+                       OnNavigate="HandleBreadcrumbNavigate" />
+
+    @if (_isPerformanceMode)
+    {
+        <div class="eq-graph-performance-warning">
+            Performance mode active — some visual details are reduced for large graphs.
+        </div>
+    }
+
+    @if (IsLoading)
+    {
+        <div class="eq-graph-loading">
+            <svg width="40" height="40" viewBox="0 0 40 40">
+                <circle class="eq-graph-spinner" cx="20" cy="20" r="16"
+                        fill="none" stroke="#0078d4" stroke-width="3"
+                        stroke-dasharray="80" stroke-linecap="round" />
+            </svg>
+        </div>
+    }
+    else if (_layoutResult == null || _layoutResult.Nodes.Count == 0)
+    {
+        <div class="eq-graph-empty">
+            @EmptyStateMessage
+        </div>
+    }
+    else
+    {
+        <svg width="100%" height="100%" class="eq-graph-svg">
+            <g id="@(Id)-viewport">
+                <defs>
+                    <marker id="@(Id)-arrowhead" viewBox="0 0 10 10"
+                            refX="10" refY="5"
+                            markerWidth="8" markerHeight="8"
+                            orient="auto-start-reverse">
+                        <path d="M 0 0 L 10 5 L 0 10 z" fill="#999" />
+                    </marker>
+                    <marker id="@(Id)-arrowhead-reverse" viewBox="0 0 10 10"
+                            refX="0" refY="5"
+                            markerWidth="8" markerHeight="8"
+                            orient="auto-start-reverse">
+                        <path d="M 10 0 L 0 5 L 10 10 z" fill="#999" />
+                    </marker>
+                </defs>
+
+                <g class="eq-graph-edges">
+                    @foreach (var edge in VisibleEdges)
+                    {
+                        <EqGraphEdge EdgePath="@edge"
+                                     IsPerformanceMode="@_isPerformanceMode"
+                                     ComponentId="@Id"
+                                     @key="edge.Edge.Id" />
+                    }
+                </g>
+
+                <g class="eq-graph-nodes">
+                    @foreach (var node in VisibleNodes)
+                    {
+                        <EqGraphNode PositionedNode="@node"
+                                     ResolvedShape="@GetResolvedShape(node.Node)"
+                                     IsSelected="@(node.Node.Id == _activeSelectedNodeId)"
+                                     IsFocused="@(node.Node.Id == _focusedNodeId)"
+                                     IsPerformanceMode="@_isPerformanceMode"
+                                     OnClick="HandleNodeClick"
+                                     OnContextMenu="HandleNodeContextMenu"
+                                     ElementId="@($"{Id}-node-{node.Node.Id}")"
+                                     @key="node.Node.Id" />
+                    }
+                </g>
+            </g>
+        </svg>
+    }
+
+    <EqGraphContextMenu IsVisible="@_contextMenuVisible"
+                        X="@_contextMenuX"
+                        Y="@_contextMenuY"
+                        Actions="@(ContextActions ?? new())"
+                        OnActionSelected="HandleContextAction"
+                        OnDismiss="DismissContextMenu" />
+</div>
+
+@code {
+    private List<PositionedNode> VisibleNodes =>
+        _layoutResult?.Nodes ?? new List<PositionedNode>();
+
+    private List<EdgePath> VisibleEdges =>
+        _layoutResult?.Edges ?? new List<EdgePath>();
+}

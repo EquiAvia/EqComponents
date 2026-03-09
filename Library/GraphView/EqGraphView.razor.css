@@ -1,0 +1,48 @@
+.eq-graph-container {
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    border: 1px solid #dee2e6;
+    border-radius: 4px;
+    background: #fafafa;
+}
+
+.eq-graph-svg {
+    flex: 1;
+}
+
+.eq-graph-loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex: 1;
+}
+
+.eq-graph-spinner {
+    animation: eq-graph-spin 1s linear infinite;
+    transform-origin: 50% 50%;
+}
+
+@@keyframes eq-graph-spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+.eq-graph-empty {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex: 1;
+    color: #999;
+    font-size: 14px;
+}
+
+.eq-graph-performance-warning {
+    background-color: #fff3cd;
+    color: #856404;
+    padding: 6px 12px;
+    font-size: 12px;
+    border-bottom: 1px solid #ffc107;
+    text-align: center;
+}
