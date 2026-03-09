@@ -9,6 +9,9 @@
 			@ref="graphView"
 			Data="@graphData"
 			LayoutMode="@layoutMode"
+			Direction="@direction"
+			Routing="@routing"
+			CornerRadius="@cornerRadius"
 			SelectedNodeId="@selectedNodeId"
 			ContextActions="@contextActions"
 			IsLoading="@isLoading"
@@ -65,7 +68,7 @@
 		<h4>Controls</h4>
 		<button class="btn btn-outline-primary btn-sm" @onclick="ToggleLoading">Toggle Loading</button>
 		<button class="btn btn-outline-primary btn-sm" @onclick="ResetView">Reset View</button>
-		<button class="btn btn-outline-primary btn-sm" @onclick="ExpandAll">Expand All</button>
+		<button class="btn btn-outline-primary btn-sm" @onclick="NavigateToRoot">Navigate to Root</button>
 		<hr />
 		<label>
 			Layout Mode:
@@ -75,6 +78,31 @@
 				<option value="Forest" selected="@(layoutMode == GraphLayoutMode.Forest)">Forest</option>
 			</select>
 		</label>
+		<label>
+			Direction:
+			<select @onchange="DirectionChanged">
+				<option value="TopToBottom" selected="@(direction == LayoutDirection.TopToBottom)">Top → Bottom</option>
+				<option value="BottomToTop" selected="@(direction == LayoutDirection.BottomToTop)">Bottom → Top</option>
+				<option value="LeftToRight" selected="@(direction == LayoutDirection.LeftToRight)">Left → Right</option>
+				<option value="RightToLeft" selected="@(direction == LayoutDirection.RightToLeft)">Right → Left</option>
+			</select>
+		</label>
+		<label>
+			Edge Routing:
+			<select @onchange="RoutingChanged">
+				<option value="Bezier" selected="@(routing == EdgeRouting.Bezier)">Bezier (Curved)</option>
+				<option value="Straight" selected="@(routing == EdgeRouting.Straight)">Straight</option>
+				<option value="Orthogonal" selected="@(routing == EdgeRouting.Orthogonal)">Orthogonal (Right-angle)</option>
+			</select>
+		</label>
+		@if (routing == EdgeRouting.Orthogonal)
+		{
+			<label>
+				Corner Radius:
+				<input type="range" min="0" max="20" step="1" value="@cornerRadius" @onchange="CornerRadiusChanged" />
+				@cornerRadius px
+			</label>
+		}
 	</div>
 </div>
 
@@ -98,6 +126,9 @@
 	private EqGraphView graphView;
 	private GraphData graphData;
 	private GraphLayoutMode layoutMode = GraphLayoutMode.Auto;
+	private LayoutDirection direction = LayoutDirection.TopToBottom;
+	private EdgeRouting routing = EdgeRouting.Bezier;
+	private double cornerRadius = 8;
 	private string selectedNodeId;
 	private GraphNode selectedNode;
 	private bool isLoading;
@@ -118,9 +149,9 @@
 		eventsFired.Add($"Node selected: {node.Label} ({node.Id})");
 	}
 
-	private void HandleContextAction(GraphContextAction action)
+	private void HandleContextAction((GraphNode Node, GraphContextAction Action) args)
 	{
-		eventsFired.Add($"Context action: {action.Label} on {selectedNode?.Label ?? "none"}");
+		eventsFired.Add($"Context action: {args.Action.Label} on {args.Node?.Label ?? "none"}");
 	}
 
 	private void HandleWarning(string message)
@@ -141,6 +172,30 @@
 		if (Enum.TryParse<GraphLayoutMode>(e.Value?.ToString(), out var mode))
 		{
 			layoutMode = mode;
+		}
+	}
+
+	private void DirectionChanged(ChangeEventArgs e)
+	{
+		if (Enum.TryParse<LayoutDirection>(e.Value?.ToString(), out var dir))
+		{
+			direction = dir;
+		}
+	}
+
+	private void RoutingChanged(ChangeEventArgs e)
+	{
+		if (Enum.TryParse<EdgeRouting>(e.Value?.ToString(), out var r))
+		{
+			routing = r;
+		}
+	}
+
+	private void CornerRadiusChanged(ChangeEventArgs e)
+	{
+		if (double.TryParse(e.Value?.ToString(), out var r))
+		{
+			cornerRadius = r;
 		}
 	}
 
@@ -279,12 +334,12 @@
 		eventsFired.Add("Reset view");
 	}
 
-	private async Task ExpandAll()
+	private async Task NavigateToRoot()
 	{
 		if (graphView != null)
 		{
-			await graphView.ExpandAll();
+			await graphView.NavigateToRoot();
 		}
-		eventsFired.Add("Expand all");
+		eventsFired.Add("Navigate to root");
 	}
 }
