@@ -30,6 +30,9 @@ namespace equiavia.components.Library.GraphView
         [Parameter] public string CSSClasses { get; set; } = string.Empty;
         [Parameter] public string AdditionalStyles { get; set; } = string.Empty;
         [Parameter] public string Height { get; set; } = "500px";
+        [Parameter] public LayoutDirection Direction { get; set; } = LayoutDirection.TopToBottom;
+        [Parameter] public EdgeRouting Routing { get; set; } = EdgeRouting.Bezier;
+        [Parameter] public double CornerRadius { get; set; } = 8;
 
         #endregion
 
@@ -207,7 +210,10 @@ namespace equiavia.components.Library.GraphView
 
             var options = new GraphLayoutOptions
             {
-                IsPerformanceMode = _isPerformanceMode
+                IsPerformanceMode = _isPerformanceMode,
+                Direction = Direction,
+                EdgeRouting = Routing,
+                CornerRadius = CornerRadius
             };
 
             var nodes = _sanitizedData.Nodes;
