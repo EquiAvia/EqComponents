@@ -179,4 +179,87 @@ public class EqGraphViewTests : BunitContext
 
         Assert.Contains("my-custom-graph", cut.Markup);
     }
+
+    [Fact]
+    public void PerformanceWarning_HasAlertRole()
+    {
+        var largeData = new GraphData();
+        for (int i = 0; i < 510; i++)
+        {
+            largeData.Nodes.Add(new GraphNode { Id = $"n{i}", Label = $"Node {i}" });
+            if (i > 0)
+                largeData.Edges.Add(new GraphEdge
+                {
+                    Id = $"e{i}",
+                    SourceNodeId = "n0",
+                    TargetNodeId = $"n{i}"
+                });
+        }
+
+        var cut = Render<EqGraphView>(p => p
+            .Add(x => x.Data, largeData)
+            .Add(x => x.PerformanceThreshold, 500));
+
+        var warning = cut.Find(".eq-graph-performance-warning");
+        Assert.Equal("alert", warning.GetAttribute("role"));
+    }
+
+    [Fact]
+    public void ContextAction_IncludesNodeInCallback()
+    {
+        (GraphNode Node, GraphContextAction Action)? result = null;
+        var actions = new List<GraphContextAction>
+        {
+            new GraphContextAction { Id = "test", Label = "Test Action" }
+        };
+
+        var cut = Render<EqGraphView>(p => p
+            .Add(x => x.Data, SimpleTree())
+            .Add(x => x.ContextActions, actions)
+            .Add(x => x.OnContextActionSelected, ((GraphNode Node, GraphContextAction Action) args) => { result = args; }));
+
+        // Trigger context menu on a node
+        var node = cut.Find(".eq-graph-node");
+        node.ContextMenu();
+
+        // Click the action in the context menu
+        var menuItem = cut.Find(".eq-graph-context-item");
+        menuItem.Click();
+
+        Assert.NotNull(result);
+        Assert.NotNull(result.Value.Node);
+        Assert.Equal("test", result.Value.Action.Id);
+    }
+
+    [Fact]
+    public void DirectionParameter_Accepted()
+    {
+        var cut = Render<EqGraphView>(p => p
+            .Add(x => x.Data, SimpleTree())
+            .Add(x => x.Direction, LayoutDirection.LeftToRight));
+
+        // Should render without errors
+        Assert.Contains("eq-graph-node", cut.Markup);
+    }
+
+    [Fact]
+    public void RoutingParameter_Accepted()
+    {
+        var cut = Render<EqGraphView>(p => p
+            .Add(x => x.Data, SimpleTree())
+            .Add(x => x.Routing, EdgeRouting.Straight));
+
+        Assert.Contains("eq-graph-edge", cut.Markup);
+    }
+
+    [Fact]
+    public void CornerRadiusParameter_Accepted()
+    {
+        var cut = Render<EqGraphView>(p => p
+            .Add(x => x.Data, SimpleTree())
+            .Add(x => x.Routing, EdgeRouting.Orthogonal)
+            .Add(x => x.CornerRadius, 12));
+
+        Assert.Contains("eq-graph-edge", cut.Markup);
+    }
 }
