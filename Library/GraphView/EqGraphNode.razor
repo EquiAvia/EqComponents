@@ -1,0 +1,117 @@
+@using equiavia.components.Library.GraphView.Layout
+@using equiavia.components.Library.GraphView.Models
+@using System.Globalization
+@using Microsoft.AspNetCore.Components.Web
+@namespace equiavia.components.Library.GraphView
+
+<g transform="@GetTransform()"
+   class="eq-graph-node @(IsSelected ? "eq-graph-node-selected" : "") @(IsFocused ? "eq-graph-node-focused" : "")"
+   role="button"
+   aria-label="@GetLabel()"
+   aria-selected="@IsSelected.ToString().ToLowerInvariant()"
+   tabindex="@(IsFocused ? 0 : -1)"
+   id="@ElementId"
+   @onclick="HandleClick"
+   @oncontextmenu="HandleContextMenu"
+   @oncontextmenu:preventDefault="true">
+
+    @* Shape *@
+    @switch (ResolvedShape)
+    {
+        case NodeShape.Circle:
+            var r = PositionedNode.Width / 2;
+            <circle cx="@r.ToString(CultureInfo.InvariantCulture)"
+                    cy="@r.ToString(CultureInfo.InvariantCulture)"
+                    r="@r.ToString(CultureInfo.InvariantCulture)"
+                    class="eq-graph-node-shape" />
+            break;
+        case NodeShape.Rectangle:
+            <rect x="0" y="0"
+                  width="@PositionedNode.Width.ToString(CultureInfo.InvariantCulture)"
+                  height="@PositionedNode.Height.ToString(CultureInfo.InvariantCulture)"
+                  class="eq-graph-node-shape" />
+            break;
+        default:
+            <rect x="0" y="0"
+                  width="@PositionedNode.Width.ToString(CultureInfo.InvariantCulture)"
+                  height="@PositionedNode.Height.ToString(CultureInfo.InvariantCulture)"
+                  rx="8" ry="8"
+                  class="eq-graph-node-shape" />
+            break;
+    }
+
+    @* Status indicator *@
+    @if (PositionedNode.Node.Status != NodeStatus.None)
+    {
+        var statusX = (PositionedNode.Width - 8).ToString(CultureInfo.InvariantCulture);
+        <circle cx="@statusX"
+                cy="8"
+                r="5"
+                class="eq-graph-node-status eq-graph-node-status-@PositionedNode.Node.Status.ToString().ToLowerInvariant()" />
+    }
+
+    @* Logo *@
+    @if (!IsPerformanceMode && !string.IsNullOrEmpty(PositionedNode.Node.LogoUrl))
+    {
+        var logoSize = 24.0;
+        var logoX = ((PositionedNode.Width - logoSize) / 2).ToString(CultureInfo.InvariantCulture);
+        var logoY = 6.0.ToString(CultureInfo.InvariantCulture);
+        <image href="@PositionedNode.Node.LogoUrl"
+               x="@logoX" y="@logoY"
+               width="@logoSize.ToString(CultureInfo.InvariantCulture)"
+               height="@logoSize.ToString(CultureInfo.InvariantCulture)" />
+    }
+
+    @* Label *@
+    @{
+        var labelText = GetDisplayLabel();
+        var textX = (PositionedNode.Width / 2).ToString(CultureInfo.InvariantCulture);
+        var textY = (!string.IsNullOrEmpty(PositionedNode.Node.LogoUrl) && !IsPerformanceMode
+            ? PositionedNode.Height - 12
+            : PositionedNode.Height / 2).ToString(CultureInfo.InvariantCulture);
+    }
+    @((MarkupString)$"<text class=\"eq-graph-node-label\" x=\"{textX}\" y=\"{textY}\" text-anchor=\"middle\" dominant-baseline=\"middle\">{System.Net.WebUtility.HtmlEncode(labelText)}</text>")
+</g>
+
+@code {
+    [Parameter] public PositionedNode PositionedNode { get; set; } = default!;
+    [Parameter] public NodeShape ResolvedShape { get; set; } = NodeShape.RoundedRectangle;
+    [Parameter] public bool IsSelected { get; set; }
+    [Parameter] public bool IsFocused { get; set; }
+    [Parameter] public bool IsPerformanceMode { get; set; }
+    [Parameter] public EventCallback<GraphNode> OnClick { get; set; }
+    [Parameter] public EventCallback<(GraphNode, MouseEventArgs)> OnContextMenu { get; set; }
+    [Parameter] public string ElementId { get; set; } = string.Empty;
+
+    private string GetTransform()
+    {
+        return $"translate({PositionedNode.X.ToString(CultureInfo.InvariantCulture)},{PositionedNode.Y.ToString(CultureInfo.InvariantCulture)})";
+    }
+
+    private string GetLabel()
+    {
+        return !string.IsNullOrEmpty(PositionedNode.Node.Label)
+            ? PositionedNode.Node.Label
+            : PositionedNode.Node.Id;
+    }
+
+    private string GetDisplayLabel()
+    {
+        var label = GetLabel();
+        if (IsPerformanceMode && label.Length > 12)
+        {
+            return label.Substring(0, 12) + "...";
+        }
+        return label;
+    }
+
+    private async Task HandleClick()
+    {
+        await OnClick.InvokeAsync(PositionedNode.Node);
+    }
+
+    private async Task HandleContextMenu(MouseEventArgs args)
+    {
+        await OnContextMenu.InvokeAsync((PositionedNode.Node, args));
+    }
+}
