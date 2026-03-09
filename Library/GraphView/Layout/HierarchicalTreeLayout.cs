@@ -15,6 +15,9 @@ namespace equiavia.components.Library.GraphView.Layout
             if (nodes.Count == 0)
                 return result;
 
+            bool isHorizontal = options.Direction == LayoutDirection.LeftToRight
+                             || options.Direction == LayoutDirection.RightToLeft;
+
             // Build parent→children map from directed edges
             var childrenMap = new Dictionary<string, List<string>>();
             var incomingSet = new HashSet<string>();
@@ -73,15 +76,22 @@ namespace equiavia.components.Library.GraphView.Layout
             }
 
             // Set Y positions based on depth
+            // For LR/RL, depth runs along the X axis after transform,
+            // so use Width + HorizontalSpacing for proper spacing
             foreach (var kvp in depth)
             {
                 var pn = positionedNodes[kvp.Key];
-                pn.Y = kvp.Value * (pn.Height + options.VerticalSpacing);
+                double depthSpacing = isHorizontal
+                    ? pn.Width + options.HorizontalSpacing
+                    : pn.Height + options.VerticalSpacing;
+                pn.Y = kvp.Value * depthSpacing;
             }
 
             // Position nodes bottom-up using post-order traversal
+            // For LR/RL, siblings stack along Y after transform,
+            // so use Height + VerticalSpacing for sibling spacing
             var xCounter = 0.0;
-            PositionSubtree(rootId, childrenMap, positionedNodes, depth, options, ref xCounter);
+            PositionSubtree(rootId, childrenMap, positionedNodes, depth, options, isHorizontal, ref xCounter);
 
             // Handle nodes not in the tree (disconnected)
             foreach (var node in nodes)
@@ -89,7 +99,10 @@ namespace equiavia.components.Library.GraphView.Layout
                 if (node.Id != rootId && !incomingSet.Contains(node.Id) && !IsDescendant(node.Id, rootId, childrenMap))
                 {
                     positionedNodes[node.Id].X = xCounter;
-                    xCounter += positionedNodes[node.Id].Width + options.HorizontalSpacing;
+                    double siblingDim = isHorizontal
+                        ? positionedNodes[node.Id].Height + options.VerticalSpacing
+                        : positionedNodes[node.Id].Width + options.HorizontalSpacing;
+                    xCounter += siblingDim;
                 }
             }
 
@@ -130,6 +143,7 @@ namespace equiavia.components.Library.GraphView.Layout
             Dictionary<string, PositionedNode> positionedNodes,
             Dictionary<string, int> depth,
             GraphLayoutOptions options,
+            bool isHorizontal,
             ref double xCounter)
         {
             var children = childrenMap[nodeId].Where(c => depth.ContainsKey(c)).ToList();
@@ -138,21 +152,29 @@ namespace equiavia.components.Library.GraphView.Layout
             {
                 // Leaf node: place at current x counter
                 positionedNodes[nodeId].X = xCounter;
-                xCounter += positionedNodes[nodeId].Width + options.HorizontalSpacing;
+                double siblingDim = isHorizontal
+                    ? positionedNodes[nodeId].Height + options.VerticalSpacing
+                    : positionedNodes[nodeId].Width + options.HorizontalSpacing;
+                xCounter += siblingDim;
                 return;
             }
 
             // Position all children first
             foreach (var childId in children)
             {
-                PositionSubtree(childId, childrenMap, positionedNodes, depth, options, ref xCounter);
+                PositionSubtree(childId, childrenMap, positionedNodes, depth, options, isHorizontal, ref xCounter);
             }
 
             // Center parent over children
             var firstChild = positionedNodes[children.First()];
             var lastChild = positionedNodes[children.Last()];
-            double childrenCenter = (firstChild.X + firstChild.Width / 2 + lastChild.X + lastChild.Width / 2) / 2;
-            positionedNodes[nodeId].X = childrenCenter - positionedNodes[nodeId].Width / 2;
+            double halfDim = isHorizontal
+                ? positionedNodes[nodeId].Height / 2
+                : positionedNodes[nodeId].Width / 2;
+            double halfFirst = isHorizontal ? firstChild.Height / 2 : firstChild.Width / 2;
+            double halfLast = isHorizontal ? lastChild.Height / 2 : lastChild.Width / 2;
+            double childrenCenter = (firstChild.X + halfFirst + lastChild.X + halfLast) / 2;
+            positionedNodes[nodeId].X = childrenCenter - halfDim;
         }
 
         private static bool IsDescendant(string nodeId, string rootId, Dictionary<string, List<string>> childrenMap)
@@ -180,7 +202,6 @@ namespace equiavia.components.Library.GraphView.Layout
 
         private static void TransformForDirection(LayoutResult result, LayoutDirection direction)
         {
-            double maxX = result.Nodes.Max(n => n.X + n.Width);
             double maxY = result.Nodes.Max(n => n.Y + n.Height);
 
             switch (direction)
@@ -191,21 +212,22 @@ namespace equiavia.components.Library.GraphView.Layout
                     break;
 
                 case LayoutDirection.LeftToRight:
+                    // Swap X/Y coordinates only — dimensions stay the same
+                    // because Calculate already used direction-aware spacing
                     foreach (var node in result.Nodes)
                     {
                         (node.X, node.Y) = (node.Y, node.X);
-                        (node.Width, node.Height) = (node.Height, node.Width);
                     }
                     break;
 
                 case LayoutDirection.RightToLeft:
-                    double swappedMaxX = maxY;
+                    // Swap X/Y then mirror along X axis
+                    double rtlMaxX = result.Nodes.Max(n => n.Y + n.Width);
                     foreach (var node in result.Nodes)
                     {
                         double newX = node.Y;
                         double newY = node.X;
-                        (node.Width, node.Height) = (node.Height, node.Width);
-                        node.X = swappedMaxX - newX - node.Width;
+                        node.X = rtlMaxX - newX - node.Width;
                         node.Y = newY;
                     }
                     break;
@@ -289,65 +311,83 @@ namespace equiavia.components.Library.GraphView.Layout
 
         private static string BuildOrthogonalPath(double startX, double startY, double endX, double endY, LayoutDirection direction, double cornerRadius)
         {
+            // L-shaped routing: short stem from parent, then turn toward child.
+            // This avoids the "bus junction" artifact of Z-shaped (midpoint) routing
+            // where multiple siblings share the same horizontal/vertical segment.
             bool isVertical = direction == LayoutDirection.TopToBottom || direction == LayoutDirection.BottomToTop;
 
             if (isVertical)
             {
-                double midY = (startY + endY) / 2;
+                // Vertical flow: drop down from parent to endY, then horizontal to child X
                 double dx = endX - startX;
 
-                if (Math.Abs(dx) < 0.1 || cornerRadius < 0.1)
+                // Straight line if aligned
+                if (Math.Abs(dx) < 0.1)
                 {
                     return string.Format(CultureInfo.InvariantCulture,
-                        "M {0},{1} L {0},{2} L {3},{2} L {3},{4}",
-                        startX, startY, midY, endX, endY);
+                        "M {0},{1} L {0},{2}",
+                        startX, startY, endY);
                 }
 
-                double r = Math.Min(cornerRadius, Math.Min(Math.Abs(midY - startY), Math.Abs(dx)) / 2);
-                double sweepDown = dx > 0 ? 1 : 0;
-                double sweepUp = dx > 0 ? 0 : 1;
+                // L-shape: vertical from start down to endY level, then horizontal to endX
+                if (cornerRadius < 0.1)
+                {
+                    return string.Format(CultureInfo.InvariantCulture,
+                        "M {0},{1} L {0},{2} L {3},{2}",
+                        startX, startY, endY, endX);
+                }
+
+                double verticalDist = Math.Abs(endY - startY);
+                double r = Math.Min(cornerRadius, Math.Min(verticalDist, Math.Abs(dx)) / 2);
                 double signX = dx > 0 ? 1 : -1;
+                double signY = endY > startY ? 1 : -1;
+                // Sweep flag for the single corner
+                double sweep = (signY > 0 && signX > 0) || (signY < 0 && signX < 0) ? 1 : 0;
 
                 return string.Format(CultureInfo.InvariantCulture,
-                    "M {0},{1} L {0},{2} A {3},{3} 0 0 {4} {5},{6} L {7},{6} A {3},{3} 0 0 {8} {9},{10} L {9},{11}",
+                    "M {0},{1} L {0},{2} A {3},{3} 0 0 {4} {5},{6} L {7},{6}",
                     startX, startY,
-                    midY - r,
+                    endY - signY * r,
                     r,
-                    sweepDown,
-                    startX + signX * r, midY,
-                    endX - signX * r, midY,
-                    sweepUp,
-                    endX, midY + r,
-                    endY);
+                    sweep,
+                    startX + signX * r, endY,
+                    endX);
             }
             else
             {
-                double midX = (startX + endX) / 2;
+                // Horizontal flow: go right from parent to endX, then vertical to child Y
                 double dy = endY - startY;
 
-                if (Math.Abs(dy) < 0.1 || cornerRadius < 0.1)
+                // Straight line if aligned
+                if (Math.Abs(dy) < 0.1)
                 {
                     return string.Format(CultureInfo.InvariantCulture,
-                        "M {0},{1} L {2},{1} L {2},{3} L {4},{3}",
-                        startX, startY, midX, endY, endX);
+                        "M {0},{1} L {2},{1}",
+                        startX, startY, endX);
                 }
 
-                double r = Math.Min(cornerRadius, Math.Min(Math.Abs(midX - startX), Math.Abs(dy)) / 2);
-                double sweepRight = dy > 0 ? 0 : 1;
-                double sweepLeft = dy > 0 ? 1 : 0;
+                // L-shape: horizontal from start to endX level, then vertical to endY
+                if (cornerRadius < 0.1)
+                {
+                    return string.Format(CultureInfo.InvariantCulture,
+                        "M {0},{1} L {2},{1} L {2},{3}",
+                        startX, startY, endX, endY);
+                }
+
+                double horizontalDist = Math.Abs(endX - startX);
+                double r = Math.Min(cornerRadius, Math.Min(horizontalDist, Math.Abs(dy)) / 2);
+                double signX = endX > startX ? 1 : -1;
                 double signY = dy > 0 ? 1 : -1;
+                double sweep = (signX > 0 && signY > 0) || (signX < 0 && signY < 0) ? 0 : 1;
 
                 return string.Format(CultureInfo.InvariantCulture,
-                    "M {0},{1} L {2},{1} A {3},{3} 0 0 {4} {5},{6} L {5},{7} A {3},{3} 0 0 {8} {9},{10} L {11},{10}",
+                    "M {0},{1} L {2},{1} A {3},{3} 0 0 {4} {5},{6} L {5},{7}",
                     startX, startY,
-                    midX - r,
+                    endX - signX * r,
                     r,
-                    sweepRight,
-                    midX, startY + signY * r,
-                    endY - signY * r,
-                    sweepLeft,
-                    midX + r, endY,
-                    endX);
+                    sweep,
+                    endX, startY + signY * r,
+                    endY);
             }
         }
     }
