@@ -2,7 +2,7 @@ using System.Collections.Generic;
 
 namespace equiavia.components.Library.GraphView.Layout
 {
-    internal class PositionedNode
+    public class PositionedNode
     {
         public Models.GraphNode Node { get; set; } = default!;
         public double X { get; set; }
@@ -11,7 +11,7 @@ namespace equiavia.components.Library.GraphView.Layout
         public double Height { get; set; }
     }
 
-    internal class EdgePath
+    public class EdgePath
     {
         public Models.GraphEdge Edge { get; set; } = default!;
         public string SvgPath { get; set; } = string.Empty;
@@ -19,7 +19,7 @@ namespace equiavia.components.Library.GraphView.Layout
         public double LabelY { get; set; }
     }
 
-    internal class LayoutResult
+    public class LayoutResult
     {
         public List<PositionedNode> Nodes { get; set; } = new();
         public List<EdgePath> Edges { get; set; } = new();

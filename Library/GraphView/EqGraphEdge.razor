@@ -1,0 +1,42 @@
+@using equiavia.components.Library.GraphView.Layout
+@using equiavia.components.Library.GraphView.Models
+@using System.Globalization
+@namespace equiavia.components.Library.GraphView
+
+<g class="eq-graph-edge">
+    @if (EdgePath.Edge.Direction == EdgeDirection.Bidirectional)
+    {
+        <path d="@EdgePath.SvgPath"
+              fill="none"
+              stroke="#999"
+              stroke-width="1.5"
+              marker-start="@($"url(#{ComponentId}-arrowhead-reverse)")"
+              marker-end="@($"url(#{ComponentId}-arrowhead)")" />
+    }
+    else if (EdgePath.Edge.Direction == EdgeDirection.Directed)
+    {
+        <path d="@EdgePath.SvgPath"
+              fill="none"
+              stroke="#999"
+              stroke-width="1.5"
+              marker-end="@($"url(#{ComponentId}-arrowhead)")" />
+    }
+    else
+    {
+        <path d="@EdgePath.SvgPath"
+              fill="none"
+              stroke="#999"
+              stroke-width="1.5" />
+    }
+
+    @if (!IsPerformanceMode && !string.IsNullOrEmpty(EdgePath.Edge.Label))
+    {
+        @((MarkupString)$"<text class=\"eq-graph-edge-label\" x=\"{EdgePath.LabelX.ToString(CultureInfo.InvariantCulture)}\" y=\"{EdgePath.LabelY.ToString(CultureInfo.InvariantCulture)}\" text-anchor=\"middle\" dominant-baseline=\"middle\">{System.Net.WebUtility.HtmlEncode(EdgePath.Edge.Label)}</text>")
+    }
+</g>
+
+@code {
+    [Parameter] public EdgePath EdgePath { get; set; } = default!;
+    [Parameter] public bool IsPerformanceMode { get; set; }
+    [Parameter] public string ComponentId { get; set; } = string.Empty;
+}
