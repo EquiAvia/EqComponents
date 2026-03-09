@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-EqComponents is a Blazor TreeView component library published as a NuGet package (`equiavia.components.Library`). The solution contains a reusable component library, a utility extensions library, and a demo Blazor WebAssembly application.
+EqComponents is a Blazor component library published as a NuGet package (`equiavia.components.Library`). It provides `EqTreeView<TValue>` (hierarchical tree) and `EqGraphView` (SVG graph visualization). The solution contains a reusable component library, a utility extensions library, a demo Blazor WebAssembly app, and a test project.
 
 ## Build Commands
 
@@ -19,15 +19,23 @@ dotnet build equiavia.components.sln -c Release
 dotnet run --project Server/equiavia.components.Server.csproj
 ```
 
-There are no test projects or linting commands in this repository.
+## Test Commands
+
+```bash
+# Run all tests (128 tests across TreeView and GraphView)
+dotnet test equiavia.components.sln --verbosity minimal
+```
+
+There are no linting commands in this repository.
 
 ## Solution Structure
 
 - **Library/** — Main Razor component library (NuGet package, `equiavia.components.Library`)
 - **equiavia.components.Utilities/** — Extension methods library (NuGet package, `equiavia.components.Utilities`)
-- **Client/** — Blazor WebAssembly demo app; `Client/Pages/TreeView.razor` demonstrates all component features
+- **Client/** — Blazor WebAssembly demo app; `Client/Pages/TreeView.razor` and `Client/Pages/GraphView.razor` demonstrate component features
 - **Server/** — ASP.NET Core host for the WebAssembly demo
 - **Shared/** — Shared data models (e.g., `Employee.cs`)
+- **Tests/** — xUnit + bUnit test project (`equiavia.components.Tests`); Library exposes internals via `InternalsVisibleTo`
 
 ## Architecture
 
@@ -41,6 +49,19 @@ The library exports a single generic component `EqTreeView<TValue>` that renders
 - `EqTreeViewItem.razor` — Recursive item renderer; receives parent context via `[CascadingParameter]`
 - `EqTreeItem.cs` — Internal tree node model wrapping the user's `TValue` data
 - `TreeViewJsInterop.cs` + `wwwroot/TreeViewJsInterop.js` — JS interop for scrolling a node into view
+
+### Graph Visualization Component (`Library/GraphView/`)
+
+`EqGraphView` renders interactive SVG graph visualizations supporting trees, forests, DAGs, and networks. Unlike TreeView, it uses concrete models (not generics/reflection).
+
+**Key files:**
+- `EqGraphView.Razor.cs` — Component logic: data pipeline, selection, keyboard navigation
+- `EqGraphView.razor` — SVG markup (no viewBox — JS manages viewport via transforms)
+- `EqGraphNode.razor` / `EqGraphEdge.razor` — SVG sub-components for nodes and edges
+- `EqGraphBreadcrumb.razor` / `EqGraphContextMenu.razor` — HTML overlay components
+- `GraphViewJSInterop.cs` + `wwwroot/GraphViewJsInterop.js` — JS interop for zoom/pan/pinch
+- `Models/` — `GraphNode`, `GraphEdge`, `GraphData`, `GraphContextAction`, enums
+- `Layout/` — `IGraphLayout` interface, `HierarchicalTreeLayout`, `ForestLayout`, `GraphStructureAnalyzer`, `GraphDataSanitizer`
 
 ### Tree Building Pattern
 
@@ -60,7 +81,7 @@ Provides reflection-based extension methods used internally by the library:
 
 ### Dependency Injection
 
-Consumers must call `EqComponents.Initialize(services)` in their `Program.cs` or `Startup.cs`. This registers `TreeViewJSInterop` as a scoped service.
+Consumers must call `EqComponents.Initialize(services)` in their `Program.cs` or `Startup.cs`. This registers `TreeViewJSInterop` and `GraphViewJSInterop` as scoped services.
 
 ### NuGet Packaging
 
@@ -80,3 +101,11 @@ Both `Library` and `equiavia.components.Utilities` have `<GeneratePackageOnBuild
 | `ShowItem(TValue item)` | Expand ancestors and scroll item into view |
 | `ExpandAll()` / `CollapseAll()` | Control all expansion states |
 | `Refresh(List<TValue> data)` | Replace the entire datasource |
+
+## Code Conventions
+
+- Component prefix: `Eq` (e.g., `EqTreeView`, `EqGraphView`)
+- JS interop: Lazy-loaded ES6 modules via `IJSRuntime.InvokeAsync<IJSObjectReference>("import", ...)`, disposed with `IAsyncDisposable`
+- Library does NOT enable `<Nullable>` — use runtime null checks, not `?` annotations
+- Library does NOT enable `<ImplicitUsings>` — add explicit `using` statements
+- Internal types exposed to tests via `[assembly: InternalsVisibleTo("equiavia.components.Tests")]` in `Library/Properties/AssemblyInfo.cs`

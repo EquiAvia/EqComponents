@@ -1,5 +1,6 @@
 .eq-graph-node {
     cursor: pointer;
+    outline: none;
 }
 
 .eq-graph-node-shape {
@@ -13,14 +14,14 @@
 }
 
 .eq-graph-node-selected .eq-graph-node-shape {
-    stroke: var(--eq-accent, #0078d4);
-    stroke-width: 2;
-    filter: drop-shadow(0 2px 4px rgba(0, 120, 212, 0.3));
+    stroke: var(--eq-node-border, #ccc);
+    stroke-width: 1.5;
+    filter: drop-shadow(0 2px 5px rgba(0, 0, 0, 0.16)) drop-shadow(0 2px 10px rgba(0, 0, 0, 0.12));
 }
 
 .eq-graph-node-focused .eq-graph-node-shape {
-    stroke: var(--eq-accent, #0078d4);
-    stroke-width: 2;
+    stroke: var(--eq-node-border-focus, #888);
+    stroke-width: 1.5;
     stroke-dasharray: 4 2;
 }
 
