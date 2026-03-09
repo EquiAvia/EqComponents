@@ -44,9 +44,10 @@
     @if (PositionedNode.Node.Status != NodeStatus.None)
     {
         var statusX = (PositionedNode.Width - 8).ToString(CultureInfo.InvariantCulture);
+        var statusR = IsPerformanceMode ? "4" : "5";
         <circle cx="@statusX"
                 cy="8"
-                r="5"
+                r="@statusR"
                 class="eq-graph-node-status eq-graph-node-status-@PositionedNode.Node.Status.ToString().ToLowerInvariant()" />
     }
 

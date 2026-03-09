@@ -9,7 +9,7 @@
         <path d="@EdgePath.SvgPath"
               fill="none"
               stroke="#999"
-              stroke-width="1.5"
+              stroke-width="@(IsPerformanceMode ? "1" : "1.5")"
               marker-start="@($"url(#{ComponentId}-arrowhead-reverse)")"
               marker-end="@($"url(#{ComponentId}-arrowhead)")" />
     }
@@ -18,7 +18,7 @@
         <path d="@EdgePath.SvgPath"
               fill="none"
               stroke="#999"
-              stroke-width="1.5"
+              stroke-width="@(IsPerformanceMode ? "1" : "1.5")"
               marker-end="@($"url(#{ComponentId}-arrowhead)")" />
     }
     else
@@ -26,7 +26,7 @@
         <path d="@EdgePath.SvgPath"
               fill="none"
               stroke="#999"
-              stroke-width="1.5" />
+              stroke-width="@(IsPerformanceMode ? "1" : "1.5")" />
     }
 
     @if (!IsPerformanceMode && !string.IsNullOrEmpty(EdgePath.Edge.Label))
