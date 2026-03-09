@@ -332,10 +332,14 @@ namespace equiavia.components.Library.GraphView.Layout
                         startX, startY, midY, endX, endY);
                 }
 
-                // Sharp T at (startX, midY); rounded corner only at (endX, midY)
-                double r = Math.Min(cornerRadius, Math.Min(Math.Abs(midY - endY), Math.Abs(dx)) / 2);
+                // Sharp T at (startX, midY); rounded corner only at (endX, midY).
+                // Cap radius by the fixed crossbar-to-child drop only (same for all siblings),
+                // not by the per-child dx which would make each sibling's radius differ.
                 double signX = dx > 0 ? 1 : -1;
                 double signY = endY > startY ? 1 : -1;
+                double dropLen = Math.Abs(endY - midY);
+                double armLen = Math.Abs(dx);
+                double r = Math.Min(cornerRadius, Math.Min(dropLen, armLen));
                 double sweep = (signX > 0 && signY > 0) || (signX < 0 && signY < 0) ? 1 : 0;
 
                 return string.Format(CultureInfo.InvariantCulture,
@@ -362,10 +366,13 @@ namespace equiavia.components.Library.GraphView.Layout
                         startX, startY, midX, endY, endX);
                 }
 
-                // Sharp T at (midX, startY); rounded corner only at (midX, endY)
-                double r = Math.Min(cornerRadius, Math.Min(Math.Abs(midX - endX), Math.Abs(dy)) / 2);
+                // Sharp T at (midX, startY); rounded corner only at (midX, endY).
+                // Cap by the fixed drop-to-child arm only, not per-child dy.
                 double signX = endX > startX ? 1 : -1;
                 double signY = dy > 0 ? 1 : -1;
+                double dropLen = Math.Abs(endX - midX);
+                double armLen = Math.Abs(dy);
+                double r = Math.Min(cornerRadius, Math.Min(dropLen, armLen));
                 double sweep = (signY > 0 && signX > 0) || (signY < 0 && signX < 0) ? 1 : 0;
 
                 return string.Format(CultureInfo.InvariantCulture,

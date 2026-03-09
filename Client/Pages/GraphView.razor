@@ -206,29 +206,49 @@
 		{
 			Nodes = new List<GraphNode>
 			{
-				new GraphNode { Id = "1", Label = "CEO", Status = NodeStatus.Ok },
-				new GraphNode { Id = "2", Label = "CTO", Status = NodeStatus.Ok },
-				new GraphNode { Id = "3", Label = "CFO", Status = NodeStatus.Warning },
-				new GraphNode { Id = "4", Label = "VP Engineering", Status = NodeStatus.Ok },
-				new GraphNode { Id = "5", Label = "VP Finance", Status = NodeStatus.None },
-				new GraphNode { Id = "6", Label = "Lead Dev", Status = NodeStatus.Ok },
-				new GraphNode { Id = "7", Label = "Lead QA", Status = NodeStatus.Error },
-				new GraphNode { Id = "8", Label = "Accountant", Status = NodeStatus.None },
-				new GraphNode { Id = "9", Label = "Analyst", Status = NodeStatus.Unknown }
+				// Level 0 — root (1 child tests single connector)
+				new GraphNode { Id = "1",  Label = "CEO",          Status = NodeStatus.Ok },
+				// Level 1 — 2 children under CEO
+				new GraphNode { Id = "2",  Label = "CTO",          Status = NodeStatus.Ok },
+				new GraphNode { Id = "3",  Label = "CFO",          Status = NodeStatus.Warning },
+				// Level 2 — CTO has 3 children
+				new GraphNode { Id = "4",  Label = "VP Eng",       Status = NodeStatus.Ok },
+				new GraphNode { Id = "5",  Label = "VP Product",   Status = NodeStatus.None },
+				new GraphNode { Id = "6",  Label = "VP QA",        Status = NodeStatus.Unknown },
+				// Level 2 — CFO has 1 child
+				new GraphNode { Id = "7",  Label = "Controller",   Status = NodeStatus.None },
+				// Level 3 — VP Eng has 4 children
+				new GraphNode { Id = "8",  Label = "Lead Dev",     Status = NodeStatus.Ok },
+				new GraphNode { Id = "9",  Label = "Lead Infra",   Status = NodeStatus.Ok },
+				new GraphNode { Id = "10", Label = "Lead Security",Status = NodeStatus.Warning },
+				new GraphNode { Id = "11", Label = "Lead Mobile",  Status = NodeStatus.Error },
+				// Level 3 — VP Product has 2 children
+				new GraphNode { Id = "12", Label = "Designer",     Status = NodeStatus.Ok },
+				new GraphNode { Id = "13", Label = "Analyst",      Status = NodeStatus.None },
+				// Level 3 — VP QA has 1 child
+				new GraphNode { Id = "14", Label = "QA Engineer",  Status = NodeStatus.Ok },
+				// Level 3 — Controller has 1 child
+				new GraphNode { Id = "15", Label = "Accountant",   Status = NodeStatus.None }
 			},
 			Edges = new List<GraphEdge>
 			{
-				new GraphEdge { Id = "e1", SourceNodeId = "1", TargetNodeId = "2" },
-				new GraphEdge { Id = "e2", SourceNodeId = "1", TargetNodeId = "3" },
-				new GraphEdge { Id = "e3", SourceNodeId = "2", TargetNodeId = "4" },
-				new GraphEdge { Id = "e4", SourceNodeId = "3", TargetNodeId = "5" },
-				new GraphEdge { Id = "e5", SourceNodeId = "4", TargetNodeId = "6" },
-				new GraphEdge { Id = "e6", SourceNodeId = "4", TargetNodeId = "7" },
-				new GraphEdge { Id = "e7", SourceNodeId = "5", TargetNodeId = "8" },
-				new GraphEdge { Id = "e8", SourceNodeId = "5", TargetNodeId = "9" }
+				new GraphEdge { Id = "e1",  SourceNodeId = "1",  TargetNodeId = "2" },
+				new GraphEdge { Id = "e2",  SourceNodeId = "1",  TargetNodeId = "3" },
+				new GraphEdge { Id = "e3",  SourceNodeId = "2",  TargetNodeId = "4" },
+				new GraphEdge { Id = "e4",  SourceNodeId = "2",  TargetNodeId = "5" },
+				new GraphEdge { Id = "e5",  SourceNodeId = "2",  TargetNodeId = "6" },
+				new GraphEdge { Id = "e6",  SourceNodeId = "3",  TargetNodeId = "7" },
+				new GraphEdge { Id = "e7",  SourceNodeId = "4",  TargetNodeId = "8" },
+				new GraphEdge { Id = "e8",  SourceNodeId = "4",  TargetNodeId = "9" },
+				new GraphEdge { Id = "e9",  SourceNodeId = "4",  TargetNodeId = "10" },
+				new GraphEdge { Id = "e10", SourceNodeId = "4",  TargetNodeId = "11" },
+				new GraphEdge { Id = "e11", SourceNodeId = "5",  TargetNodeId = "12" },
+				new GraphEdge { Id = "e12", SourceNodeId = "5",  TargetNodeId = "13" },
+				new GraphEdge { Id = "e13", SourceNodeId = "6",  TargetNodeId = "14" },
+				new GraphEdge { Id = "e14", SourceNodeId = "7",  TargetNodeId = "15" }
 			}
 		};
-		eventsFired.Add("Loaded hierarchy dataset (9 nodes)");
+		eventsFired.Add("Loaded hierarchy dataset (15 nodes, 2/3/4-child branches)");
 	}
 
 	private void LoadForest()
