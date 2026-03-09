@@ -11,8 +11,8 @@
 .eq-graph-context-menu {
     position: fixed;
     z-index: 1000;
-    background: #ffffff;
-    border: 1px solid #dee2e6;
+    background: var(--eq-node-bg, #ffffff);
+    border: 1px solid var(--eq-border, #dee2e6);
     border-radius: 6px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
     min-width: 160px;
@@ -26,7 +26,7 @@
     padding: 6px 12px;
     cursor: pointer;
     font-size: 13px;
-    color: #333;
+    color: var(--eq-text, #333);
     position: relative;
 }
 
@@ -36,7 +36,7 @@
 
 .eq-graph-context-separator {
     height: 1px;
-    background-color: #dee2e6;
+    background-color: var(--eq-border, #dee2e6);
     margin: 4px 0;
 }
 
@@ -51,7 +51,7 @@
 
 .eq-graph-context-submenu-arrow {
     font-size: 10px;
-    color: #999;
+    color: var(--eq-text-muted, #999);
 }
 
 .eq-graph-context-submenu {
@@ -59,8 +59,8 @@
     position: absolute;
     left: 100%;
     top: 0;
-    background: #ffffff;
-    border: 1px solid #dee2e6;
+    background: var(--eq-node-bg, #ffffff);
+    border: 1px solid var(--eq-border, #dee2e6);
     border-radius: 6px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
     min-width: 140px;

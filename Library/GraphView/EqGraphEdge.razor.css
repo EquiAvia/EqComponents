@@ -1,5 +1,5 @@
 .eq-graph-edge-label {
     font-size: 11px;
     pointer-events: none;
-    fill: #666;
+    fill: var(--eq-text-muted, #666);
 }

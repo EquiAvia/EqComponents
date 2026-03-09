@@ -1,7 +1,7 @@
 .eq-graph-breadcrumb {
     padding: 6px 12px;
-    background-color: #f8f9fa;
-    border-bottom: 1px solid #dee2e6;
+    background-color: var(--eq-surface, #f8f9fa);
+    border-bottom: 1px solid var(--eq-border, #dee2e6);
 }
 
 .eq-graph-breadcrumb-list {
@@ -23,7 +23,7 @@
 .eq-graph-breadcrumb-button {
     background: none;
     border: none;
-    color: #0078d4;
+    color: var(--eq-accent, #0078d4);
     cursor: pointer;
     padding: 2px 4px;
     border-radius: 3px;
@@ -36,12 +36,12 @@
 }
 
 .eq-graph-breadcrumb-separator {
-    color: #999;
+    color: var(--eq-text-muted, #999);
     font-size: 13px;
 }
 
 .eq-graph-breadcrumb-current {
     font-size: 13px;
     font-weight: 600;
-    color: #333;
+    color: var(--eq-text, #333);
 }

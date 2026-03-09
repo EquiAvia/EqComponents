@@ -3,36 +3,36 @@
 }
 
 .eq-graph-node-shape {
-    fill: #ffffff;
-    stroke: #ccc;
+    fill: var(--eq-node-bg, #ffffff);
+    stroke: var(--eq-node-border, #ccc);
     stroke-width: 1.5;
 }
 
 .eq-graph-node:hover .eq-graph-node-shape {
-    stroke: #888;
+    stroke: var(--eq-node-border-hover, #888);
 }
 
 .eq-graph-node-selected .eq-graph-node-shape {
-    stroke: #0078d4;
+    stroke: var(--eq-accent, #0078d4);
     stroke-width: 2;
     filter: drop-shadow(0 2px 4px rgba(0, 120, 212, 0.3));
 }
 
 .eq-graph-node-focused .eq-graph-node-shape {
-    stroke: #0078d4;
+    stroke: var(--eq-accent, #0078d4);
     stroke-width: 2;
     stroke-dasharray: 4 2;
 }
 
 ::deep .eq-graph-node-label {
     font-size: 12px;
-    fill: #333;
+    fill: var(--eq-node-label, #333);
     pointer-events: none;
     user-select: none;
 }
 
 .eq-graph-node-status {
-    stroke: #fff;
+    stroke: var(--eq-node-bg, #fff);
     stroke-width: 1;
 }
 
