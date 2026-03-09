@@ -290,6 +290,10 @@ namespace equiavia.components.Library.GraphView.Layout
 
             if (isVertical)
             {
+                // Same Y: degenerate case, draw a straight horizontal line
+                if (Math.Abs(endY - startY) < 0.1)
+                    return BuildStraightPath(startX, startY, endX, endY);
+
                 double cp = (endY - startY) * 0.45;
                 return string.Format(CultureInfo.InvariantCulture,
                     "M {0},{1} C {0},{2} {3},{4} {3},{5}",
@@ -300,6 +304,10 @@ namespace equiavia.components.Library.GraphView.Layout
             }
             else
             {
+                // Same X: degenerate case, draw a straight vertical line
+                if (Math.Abs(endX - startX) < 0.1)
+                    return BuildStraightPath(startX, startY, endX, endY);
+
                 double cp = (endX - startX) * 0.45;
                 return string.Format(CultureInfo.InvariantCulture,
                     "M {0},{1} C {2},{1} {3},{4} {5},{4}",
@@ -350,8 +358,10 @@ namespace equiavia.components.Library.GraphView.Layout
                 double r = Math.Min(cornerRadius, Math.Min(dropLen, armLen));
                 double sweep = (signX > 0 && signY > 0) || (signX < 0 && signY < 0) ? 1 : 0;
 
+                // Use space-separated rx ry (not comma) so OffsetSvgPath in ForestLayout
+                // does not mistake the radii for a coordinate pair and corrupt them.
                 return string.Format(CultureInfo.InvariantCulture,
-                    "M {0},{1} L {0},{2} L {3},{2} A {4},{4} 0 0 {5} {6},{7} L {6},{8}",
+                    "M {0},{1} L {0},{2} L {3},{2} A {4} {4} 0 0 {5} {6},{7} L {6},{8}",
                     startX, startY,
                     midY,
                     endX - signX * r,
@@ -386,7 +396,7 @@ namespace equiavia.components.Library.GraphView.Layout
                 double sweep = (signX > 0 && signY < 0) || (signX < 0 && signY > 0) ? 1 : 0;
 
                 return string.Format(CultureInfo.InvariantCulture,
-                    "M {0},{1} L {2},{1} L {2},{3} A {4},{4} 0 0 {5} {6},{7} L {8},{7}",
+                    "M {0},{1} L {2},{1} L {2},{3} A {4} {4} 0 0 {5} {6},{7} L {8},{7}",
                     startX, startY,
                     midX,
                     endY - signY * r,
