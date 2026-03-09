@@ -1,0 +1,85 @@
+@using equiavia.components.Library.GraphView.Models
+@using System.Globalization
+@namespace equiavia.components.Library.GraphView
+
+@if (IsVisible)
+{
+    <div class="eq-graph-context-overlay" @onclick="HandleOverlayClick"></div>
+    <div class="eq-graph-context-menu"
+         role="menu"
+         style="@GetPositionStyle()">
+        @foreach (var action in Actions)
+        {
+            @if (action.IsSeparator)
+            {
+                <div class="eq-graph-context-separator" role="separator"></div>
+            }
+            else if (action.Children != null && action.Children.Count > 0)
+            {
+                <div class="eq-graph-context-item eq-graph-context-submenu-parent" role="menuitem">
+                    <span>@action.Label</span>
+                    <span class="eq-graph-context-submenu-arrow">&#9656;</span>
+                    <div class="eq-graph-context-submenu" role="menu">
+                        @foreach (var child in action.Children)
+                        {
+                            @if (child.IsSeparator)
+                            {
+                                <div class="eq-graph-context-separator" role="separator"></div>
+                            }
+                            else
+                            {
+                                var capturedChild = child;
+                                <div class="eq-graph-context-item"
+                                     role="menuitem"
+                                     @onclick="() => HandleActionClick(capturedChild)">
+                                    @if (!string.IsNullOrEmpty(child.IconUrl))
+                                    {
+                                        <img src="@child.IconUrl" class="eq-graph-context-icon" alt="" />
+                                    }
+                                    <span>@child.Label</span>
+                                </div>
+                            }
+                        }
+                    </div>
+                </div>
+            }
+            else
+            {
+                var capturedAction = action;
+                <div class="eq-graph-context-item"
+                     role="menuitem"
+                     @onclick="() => HandleActionClick(capturedAction)">
+                    @if (!string.IsNullOrEmpty(action.IconUrl))
+                    {
+                        <img src="@action.IconUrl" class="eq-graph-context-icon" alt="" />
+                    }
+                    <span>@action.Label</span>
+                </div>
+            }
+        }
+    </div>
+}
+
+@code {
+    [Parameter] public bool IsVisible { get; set; }
+    [Parameter] public double X { get; set; }
+    [Parameter] public double Y { get; set; }
+    [Parameter] public List<GraphContextAction> Actions { get; set; } = new();
+    [Parameter] public EventCallback<GraphContextAction> OnActionSelected { get; set; }
+    [Parameter] public EventCallback OnDismiss { get; set; }
+
+    private string GetPositionStyle()
+    {
+        return $"left:{X.ToString(CultureInfo.InvariantCulture)}px;top:{Y.ToString(CultureInfo.InvariantCulture)}px;";
+    }
+
+    private async Task HandleOverlayClick()
+    {
+        await OnDismiss.InvokeAsync();
+    }
+
+    private async Task HandleActionClick(GraphContextAction action)
+    {
+        await OnActionSelected.InvokeAsync(action);
+    }
+}
