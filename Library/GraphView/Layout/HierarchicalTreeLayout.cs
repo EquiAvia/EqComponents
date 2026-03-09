@@ -102,25 +102,8 @@ namespace equiavia.components.Library.GraphView.Layout
                 {
                     var source = positionedNodes[edge.SourceNodeId];
                     var target = positionedNodes[edge.TargetNodeId];
-
-                    double startX = source.X + source.Width / 2;
-                    double startY = source.Y + source.Height;
-                    double endX = target.X + target.Width / 2;
-                    double endY = target.Y;
-                    double midY = (startY + endY) / 2;
-
-                    var svgPath = string.Format(
-                        CultureInfo.InvariantCulture,
-                        "M {0},{1} C {0},{2} {3},{2} {3},{4}",
-                        startX, startY, midY, endX, endY);
-
-                    result.Edges.Add(new EdgePath
-                    {
-                        Edge = edge,
-                        SvgPath = svgPath,
-                        LabelX = (startX + endX) / 2,
-                        LabelY = (startY + endY) / 2
-                    });
+                    var edgePath = BuildEdgePath(source, target, edge, options);
+                    result.Edges.Add(edgePath);
                 }
             }
 
@@ -186,6 +169,145 @@ namespace equiavia.components.Library.GraphView.Layout
         private static NodeShape ResolveShape(NodeShape shape)
         {
             return shape == NodeShape.Auto ? NodeShape.RoundedRectangle : shape;
+        }
+
+        internal static EdgePath BuildEdgePath(PositionedNode source, PositionedNode target, GraphEdge edge, GraphLayoutOptions options)
+        {
+            double startX, startY, endX, endY;
+
+            switch (options.Direction)
+            {
+                case LayoutDirection.BottomToTop:
+                    startX = source.X + source.Width / 2;
+                    startY = source.Y;
+                    endX = target.X + target.Width / 2;
+                    endY = target.Y + target.Height;
+                    break;
+                case LayoutDirection.LeftToRight:
+                    startX = source.X + source.Width;
+                    startY = source.Y + source.Height / 2;
+                    endX = target.X;
+                    endY = target.Y + target.Height / 2;
+                    break;
+                case LayoutDirection.RightToLeft:
+                    startX = source.X;
+                    startY = source.Y + source.Height / 2;
+                    endX = target.X + target.Width;
+                    endY = target.Y + target.Height / 2;
+                    break;
+                default: // TopToBottom
+                    startX = source.X + source.Width / 2;
+                    startY = source.Y + source.Height;
+                    endX = target.X + target.Width / 2;
+                    endY = target.Y;
+                    break;
+            }
+
+            string svgPath = options.EdgeRouting switch
+            {
+                EdgeRouting.Straight => BuildStraightPath(startX, startY, endX, endY),
+                EdgeRouting.Orthogonal => BuildOrthogonalPath(startX, startY, endX, endY, options.Direction, options.CornerRadius),
+                _ => BuildBezierPath(startX, startY, endX, endY, options.Direction)
+            };
+
+            return new EdgePath
+            {
+                Edge = edge,
+                SvgPath = svgPath,
+                LabelX = (startX + endX) / 2,
+                LabelY = (startY + endY) / 2
+            };
+        }
+
+        private static string BuildBezierPath(double startX, double startY, double endX, double endY, LayoutDirection direction)
+        {
+            bool isVertical = direction == LayoutDirection.TopToBottom || direction == LayoutDirection.BottomToTop;
+
+            if (isVertical)
+            {
+                double midY = (startY + endY) / 2;
+                return string.Format(CultureInfo.InvariantCulture,
+                    "M {0},{1} C {0},{2} {3},{2} {3},{4}",
+                    startX, startY, midY, endX, endY);
+            }
+            else
+            {
+                double midX = (startX + endX) / 2;
+                return string.Format(CultureInfo.InvariantCulture,
+                    "M {0},{1} C {2},{1} {2},{3} {4},{3}",
+                    startX, startY, midX, endY, endX);
+            }
+        }
+
+        private static string BuildStraightPath(double startX, double startY, double endX, double endY)
+        {
+            return string.Format(CultureInfo.InvariantCulture,
+                "M {0},{1} L {2},{3}",
+                startX, startY, endX, endY);
+        }
+
+        private static string BuildOrthogonalPath(double startX, double startY, double endX, double endY, LayoutDirection direction, double cornerRadius)
+        {
+            bool isVertical = direction == LayoutDirection.TopToBottom || direction == LayoutDirection.BottomToTop;
+
+            if (isVertical)
+            {
+                double midY = (startY + endY) / 2;
+                double dx = endX - startX;
+
+                if (Math.Abs(dx) < 0.1 || cornerRadius < 0.1)
+                {
+                    return string.Format(CultureInfo.InvariantCulture,
+                        "M {0},{1} L {0},{2} L {3},{2} L {3},{4}",
+                        startX, startY, midY, endX, endY);
+                }
+
+                double r = Math.Min(cornerRadius, Math.Min(Math.Abs(midY - startY), Math.Abs(dx)) / 2);
+                double sweepDown = dx > 0 ? 1 : 0;
+                double sweepUp = dx > 0 ? 0 : 1;
+                double signX = dx > 0 ? 1 : -1;
+
+                return string.Format(CultureInfo.InvariantCulture,
+                    "M {0},{1} L {0},{2} A {3},{3} 0 0 {4} {5},{6} L {7},{6} A {3},{3} 0 0 {8} {9},{10} L {9},{11}",
+                    startX, startY,
+                    midY - r,
+                    r,
+                    sweepDown,
+                    startX + signX * r, midY,
+                    endX - signX * r, midY,
+                    sweepUp,
+                    endX, midY + r,
+                    endY);
+            }
+            else
+            {
+                double midX = (startX + endX) / 2;
+                double dy = endY - startY;
+
+                if (Math.Abs(dy) < 0.1 || cornerRadius < 0.1)
+                {
+                    return string.Format(CultureInfo.InvariantCulture,
+                        "M {0},{1} L {2},{1} L {2},{3} L {4},{3}",
+                        startX, startY, midX, endY, endX);
+                }
+
+                double r = Math.Min(cornerRadius, Math.Min(Math.Abs(midX - startX), Math.Abs(dy)) / 2);
+                double sweepRight = dy > 0 ? 0 : 1;
+                double sweepLeft = dy > 0 ? 1 : 0;
+                double signY = dy > 0 ? 1 : -1;
+
+                return string.Format(CultureInfo.InvariantCulture,
+                    "M {0},{1} L {2},{1} A {3},{3} 0 0 {4} {5},{6} L {5},{7} A {3},{3} 0 0 {8} {9},{10} L {11},{10}",
+                    startX, startY,
+                    midX - r,
+                    r,
+                    sweepRight,
+                    midX, startY + signY * r,
+                    endY - signY * r,
+                    sweepLeft,
+                    midX + r, endY,
+                    endX);
+            }
         }
     }
 }
