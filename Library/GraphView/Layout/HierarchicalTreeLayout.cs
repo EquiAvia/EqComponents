@@ -311,10 +311,10 @@ namespace equiavia.components.Library.GraphView.Layout
 
         private static string BuildOrthogonalPath(double startX, double startY, double endX, double endY, LayoutDirection direction, double cornerRadius)
         {
-            // 3-segment org-chart style connector:
-            //   1. Stem from parent to midpoint
-            //   2. Crossbar at midpoint to align with child
-            //   3. Drop from crossbar into child (arrowhead points into child)
+            // 3-segment org-chart connector:
+            //   1. Stem:     parent → midpoint  (sharp T-intersection, no arc)
+            //   2. Crossbar: midpoint → child column/row  (sharp on stem side)
+            //   3. Drop:     child column/row → child  (single rounded corner, consistent radius)
             bool isVertical = direction == LayoutDirection.TopToBottom || direction == LayoutDirection.BottomToTop;
 
             if (isVertical)
@@ -322,15 +322,9 @@ namespace equiavia.components.Library.GraphView.Layout
                 double dx = endX - startX;
                 double midY = (startY + endY) / 2;
 
-                // Straight vertical line if aligned
                 if (Math.Abs(dx) < 0.1)
-                {
-                    return string.Format(CultureInfo.InvariantCulture,
-                        "M {0},{1} L {0},{2}",
-                        startX, startY, endY);
-                }
+                    return string.Format(CultureInfo.InvariantCulture, "M {0},{1} L {0},{2}", startX, startY, endY);
 
-                // 3 segments: vertical stem, horizontal crossbar, vertical drop
                 if (cornerRadius < 0.1)
                 {
                     return string.Format(CultureInfo.InvariantCulture,
@@ -338,24 +332,18 @@ namespace equiavia.components.Library.GraphView.Layout
                         startX, startY, midY, endX, endY);
                 }
 
-                double halfVert = Math.Abs(midY - startY);
-                double r = Math.Min(cornerRadius, Math.Min(halfVert, Math.Abs(dx)) / 2);
+                // Sharp T at (startX, midY); rounded corner only at (endX, midY)
+                double r = Math.Min(cornerRadius, Math.Min(Math.Abs(midY - endY), Math.Abs(dx)) / 2);
                 double signX = dx > 0 ? 1 : -1;
                 double signY = endY > startY ? 1 : -1;
-                // First corner: vertical→horizontal
-                double sweep1 = (signY > 0 && signX > 0) || (signY < 0 && signX < 0) ? 1 : 0;
-                // Second corner: horizontal→vertical
-                double sweep2 = (signX > 0 && signY > 0) || (signX < 0 && signY < 0) ? 0 : 1;
+                double sweep = (signX > 0 && signY > 0) || (signX < 0 && signY < 0) ? 1 : 0;
 
                 return string.Format(CultureInfo.InvariantCulture,
-                    "M {0},{1} L {0},{2} A {3},{3} 0 0 {4} {5},{6} L {7},{6} A {3},{3} 0 0 {8} {9},{10} L {9},{11}",
+                    "M {0},{1} L {0},{2} L {3},{2} A {4},{4} 0 0 {5} {6},{7} L {6},{8}",
                     startX, startY,
-                    midY - signY * r,
-                    r,
-                    sweep1,
-                    startX + signX * r, midY,
+                    midY,
                     endX - signX * r,
-                    sweep2,
+                    r, sweep,
                     endX, midY + signY * r,
                     endY);
             }
@@ -364,15 +352,9 @@ namespace equiavia.components.Library.GraphView.Layout
                 double dy = endY - startY;
                 double midX = (startX + endX) / 2;
 
-                // Straight horizontal line if aligned
                 if (Math.Abs(dy) < 0.1)
-                {
-                    return string.Format(CultureInfo.InvariantCulture,
-                        "M {0},{1} L {2},{1}",
-                        startX, startY, endX);
-                }
+                    return string.Format(CultureInfo.InvariantCulture, "M {0},{1} L {2},{1}", startX, startY, endX);
 
-                // 3 segments: horizontal stem, vertical crossbar, horizontal drop
                 if (cornerRadius < 0.1)
                 {
                     return string.Format(CultureInfo.InvariantCulture,
@@ -380,24 +362,18 @@ namespace equiavia.components.Library.GraphView.Layout
                         startX, startY, midX, endY, endX);
                 }
 
-                double halfHoriz = Math.Abs(midX - startX);
-                double r = Math.Min(cornerRadius, Math.Min(halfHoriz, Math.Abs(dy)) / 2);
+                // Sharp T at (midX, startY); rounded corner only at (midX, endY)
+                double r = Math.Min(cornerRadius, Math.Min(Math.Abs(midX - endX), Math.Abs(dy)) / 2);
                 double signX = endX > startX ? 1 : -1;
                 double signY = dy > 0 ? 1 : -1;
-                // First corner: horizontal→vertical
-                double sweep1 = (signX > 0 && signY > 0) || (signX < 0 && signY < 0) ? 0 : 1;
-                // Second corner: vertical→horizontal
-                double sweep2 = (signY > 0 && signX > 0) || (signY < 0 && signX < 0) ? 1 : 0;
+                double sweep = (signY > 0 && signX > 0) || (signY < 0 && signX < 0) ? 1 : 0;
 
                 return string.Format(CultureInfo.InvariantCulture,
-                    "M {0},{1} L {2},{1} A {3},{3} 0 0 {4} {5},{6} L {5},{7} A {3},{3} 0 0 {8} {9},{10} L {11},{10}",
+                    "M {0},{1} L {2},{1} L {2},{3} A {4},{4} 0 0 {5} {6},{7} L {8},{7}",
                     startX, startY,
-                    midX - signX * r,
-                    r,
-                    sweep1,
-                    midX, startY + signY * r,
+                    midX,
                     endY - signY * r,
-                    sweep2,
+                    r, sweep,
                     midX + signX * r, endY,
                     endX);
             }
