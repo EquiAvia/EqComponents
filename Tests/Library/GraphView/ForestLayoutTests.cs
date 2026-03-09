@@ -82,4 +82,35 @@ public class ForestLayoutTests
         var xValues = result.Nodes.Select(n => n.X).Distinct().ToList();
         Assert.Equal(3, xValues.Count);
     }
+
+    [Fact]
+    public void LeftToRight_ComponentsStackedVertically()
+    {
+        var nodes = new List<GraphNode> { N("A"), N("B"), N("C") };
+        var edges = new List<GraphEdge> { E("A", "B") }; // A-B is one tree, C is isolated
+
+        var options = new GraphLayoutOptions { Direction = LayoutDirection.LeftToRight };
+        var result = Layout(nodes, edges, options);
+
+        // In LR mode, ForestLayout should stack components vertically (by Y offset)
+        var ab = result.Nodes.Where(n => n.Node.Id == "A" || n.Node.Id == "B");
+        var c = result.Nodes.First(n => n.Node.Id == "C");
+
+        double abMaxY = ab.Max(n => n.Y + n.Height);
+        Assert.True(c.Y >= abMaxY, "In LR mode, second component should be below first");
+    }
+
+    [Fact]
+    public void ForestLayout_PassesRoutingToDelegate()
+    {
+        var nodes = new List<GraphNode> { N("A"), N("B") };
+        var edges = new List<GraphEdge> { E("A", "B") };
+
+        var options = new GraphLayoutOptions { EdgeRouting = EdgeRouting.Straight };
+        var result = Layout(nodes, edges, options);
+
+        var path = result.Edges[0].SvgPath;
+        Assert.Contains("L", path);
+        Assert.DoesNotContain("C", path);
+    }
 }

@@ -20,7 +20,10 @@ namespace equiavia.components.Library.GraphView.Layout
 
             var hierarchicalLayout = new HierarchicalTreeLayout();
             double xOffset = 0;
-            double maxHeight = 0;
+            double yOffset = 0;
+
+            bool isVerticalFlow = options.Direction == LayoutDirection.TopToBottom
+                               || options.Direction == LayoutDirection.BottomToTop;
 
             foreach (var component in components)
             {
@@ -31,31 +34,50 @@ namespace equiavia.components.Library.GraphView.Layout
 
                 var componentResult = hierarchicalLayout.Calculate(component, componentEdges, options);
 
-                // Offset node X positions
-                foreach (var pn in componentResult.Nodes)
+                if (isVerticalFlow)
                 {
-                    pn.X += xOffset;
-                    result.Nodes.Add(pn);
-                }
+                    // Components arranged left-to-right (offset X)
+                    foreach (var pn in componentResult.Nodes)
+                    {
+                        pn.X += xOffset;
+                        result.Nodes.Add(pn);
+                    }
 
-                // Offset edge SVG path X coordinates
-                foreach (var ep in componentResult.Edges)
+                    foreach (var ep in componentResult.Edges)
+                    {
+                        if (xOffset > 0)
+                            ep.SvgPath = OffsetSvgPath(ep.SvgPath, xOffset, 0);
+                        ep.LabelX += xOffset;
+                        result.Edges.Add(ep);
+                    }
+
+                    double componentWidth = componentResult.TotalWidth;
+                    if (componentWidth <= 0 && componentResult.Nodes.Count > 0)
+                        componentWidth = componentResult.Nodes.Max(n => n.X + n.Width) - componentResult.Nodes.Min(n => n.X);
+                    xOffset += componentWidth + options.HorizontalSpacing;
+                }
+                else
                 {
-                    if (xOffset > 0)
-                        ep.SvgPath = OffsetSvgPathX(ep.SvgPath, xOffset);
+                    // Components arranged top-to-bottom (offset Y) for LR/RL
+                    foreach (var pn in componentResult.Nodes)
+                    {
+                        pn.Y += yOffset;
+                        result.Nodes.Add(pn);
+                    }
 
-                    ep.LabelX += xOffset;
-                    result.Edges.Add(ep);
+                    foreach (var ep in componentResult.Edges)
+                    {
+                        if (yOffset > 0)
+                            ep.SvgPath = OffsetSvgPath(ep.SvgPath, 0, yOffset);
+                        ep.LabelY += yOffset;
+                        result.Edges.Add(ep);
+                    }
+
+                    double componentHeight = componentResult.TotalHeight;
+                    if (componentHeight <= 0 && componentResult.Nodes.Count > 0)
+                        componentHeight = componentResult.Nodes.Max(n => n.Y + n.Height) - componentResult.Nodes.Min(n => n.Y);
+                    yOffset += componentHeight + options.VerticalSpacing;
                 }
-
-                double componentWidth = componentResult.TotalWidth;
-                if (componentWidth <= 0 && componentResult.Nodes.Count > 0)
-                    componentWidth = componentResult.Nodes.Max(n => n.X + n.Width) - componentResult.Nodes.Min(n => n.X);
-
-                xOffset += componentWidth + options.HorizontalSpacing;
-
-                if (componentResult.TotalHeight > maxHeight)
-                    maxHeight = componentResult.TotalHeight;
             }
 
             // Calculate total dimensions
@@ -120,8 +142,11 @@ namespace equiavia.components.Library.GraphView.Layout
             return components;
         }
 
-        private static string OffsetSvgPathX(string path, double offset)
+        private static string OffsetSvgPath(string path, double offsetX, double offsetY)
         {
+            if (offsetX == 0 && offsetY == 0)
+                return path;
+
             var parts = path.Split(' ');
             var result = new List<string>();
 
@@ -134,7 +159,7 @@ namespace equiavia.components.Library.GraphView.Layout
                         double.TryParse(coords[0], NumberStyles.Float, CultureInfo.InvariantCulture, out double x) &&
                         double.TryParse(coords[1], NumberStyles.Float, CultureInfo.InvariantCulture, out double y))
                     {
-                        result.Add(string.Format(CultureInfo.InvariantCulture, "{0},{1}", x + offset, y));
+                        result.Add(string.Format(CultureInfo.InvariantCulture, "{0},{1}", x + offsetX, y + offsetY));
                     }
                     else
                     {
