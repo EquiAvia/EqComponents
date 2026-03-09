@@ -290,7 +290,7 @@ namespace equiavia.components.Library.GraphView.Layout
 
             if (isVertical)
             {
-                double cp = (endY - startY) / 3;
+                double cp = (endY - startY) * 0.45;
                 return string.Format(CultureInfo.InvariantCulture,
                     "M {0},{1} C {0},{2} {3},{4} {3},{5}",
                     startX, startY,
@@ -300,7 +300,7 @@ namespace equiavia.components.Library.GraphView.Layout
             }
             else
             {
-                double cp = (endX - startX) / 3;
+                double cp = (endX - startX) * 0.45;
                 return string.Format(CultureInfo.InvariantCulture,
                     "M {0},{1} C {2},{1} {3},{4} {5},{4}",
                     startX, startY,
