@@ -373,7 +373,9 @@ namespace equiavia.components.Library.GraphView.Layout
                 double dropLen = Math.Abs(endX - midX);
                 double armLen = Math.Abs(dy);
                 double r = Math.Min(cornerRadius, Math.Min(dropLen, armLen));
-                double sweep = (signY > 0 && signX > 0) || (signY < 0 && signX < 0) ? 1 : 0;
+                // LR/RL corner: crossbar is vertical, drop is horizontal.
+                // Convex arc needs opposite sign rule vs TB/BT (where crossbar is horizontal).
+                double sweep = (signX > 0 && signY < 0) || (signX < 0 && signY > 0) ? 1 : 0;
 
                 return string.Format(CultureInfo.InvariantCulture,
                     "M {0},{1} L {2},{1} L {2},{3} A {4},{4} 0 0 {5} {6},{7} L {8},{7}",
