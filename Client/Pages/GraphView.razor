@@ -1,0 +1,290 @@
+@page "/graphview"
+@using equiavia.components.Library.GraphView
+@using equiavia.components.Library.GraphView.Models
+
+<h1>Graph View</h1>
+<div class="row">
+	<div class="col-8">
+		<EqGraphView
+			@ref="graphView"
+			Data="@graphData"
+			LayoutMode="@layoutMode"
+			SelectedNodeId="@selectedNodeId"
+			ContextActions="@contextActions"
+			IsLoading="@isLoading"
+			PerformanceThreshold="500"
+			Height="500px"
+			OnNodeSelected="HandleNodeSelected"
+			OnContextActionSelected="HandleContextAction"
+			OnDataWarning="HandleWarning"
+			OnSelectionCleared="HandleSelectionCleared" />
+	</div>
+	<div class="col-4">
+		<h4>Selected Node</h4>
+		@if (selectedNode != null)
+		{
+			<ul>
+				<li><strong>ID:</strong> @selectedNode.Id</li>
+				<li><strong>Label:</strong> @selectedNode.Label</li>
+				<li><strong>Status:</strong> @selectedNode.Status</li>
+				<li><strong>Shape:</strong> @selectedNode.Shape</li>
+			</ul>
+		}
+		else
+		{
+			<p>No node selected.</p>
+		}
+
+		<h4>Warnings</h4>
+		@if (warnings.Count > 0)
+		{
+			<ul>
+				@foreach (var w in warnings)
+				{
+					<li class="text-warning">@w</li>
+				}
+			</ul>
+		}
+		else
+		{
+			<p>None</p>
+		}
+	</div>
+</div>
+
+<div class="row mt-3">
+	<div class="col">
+		<h4>Datasets</h4>
+		<button class="btn btn-primary btn-sm" @onclick="LoadHierarchy">Load Hierarchy</button>
+		<button class="btn btn-primary btn-sm" @onclick="LoadForest">Load Forest</button>
+		<button class="btn btn-primary btn-sm" @onclick="LoadDAG">Load DAG</button>
+		<button class="btn btn-primary btn-sm" @onclick="LoadLarge">Load Large</button>
+		<button class="btn btn-secondary btn-sm" @onclick="Clear">Clear</button>
+	</div>
+	<div class="col">
+		<h4>Controls</h4>
+		<button class="btn btn-outline-primary btn-sm" @onclick="ToggleLoading">Toggle Loading</button>
+		<button class="btn btn-outline-primary btn-sm" @onclick="ResetView">Reset View</button>
+		<button class="btn btn-outline-primary btn-sm" @onclick="ExpandAll">Expand All</button>
+		<hr />
+		<label>
+			Layout Mode:
+			<select @onchange="LayoutModeChanged">
+				<option value="Auto" selected="@(layoutMode == GraphLayoutMode.Auto)">Auto</option>
+				<option value="HierarchicalTree" selected="@(layoutMode == GraphLayoutMode.HierarchicalTree)">Hierarchical Tree</option>
+				<option value="Forest" selected="@(layoutMode == GraphLayoutMode.Forest)">Forest</option>
+			</select>
+		</label>
+	</div>
+</div>
+
+<hr />
+<h4>Events Fired</h4>
+<ul>
+	@if (eventsFired.Count > 0)
+	{
+		@foreach (var item in eventsFired)
+		{
+			<li>@item</li>
+		}
+	}
+	else
+	{
+		<li>None</li>
+	}
+</ul>
+
+@code {
+	private EqGraphView graphView;
+	private GraphData graphData;
+	private GraphLayoutMode layoutMode = GraphLayoutMode.Auto;
+	private string selectedNodeId;
+	private GraphNode selectedNode;
+	private bool isLoading;
+	private List<string> warnings = new();
+	private List<string> eventsFired = new();
+	private List<GraphContextAction> contextActions = new()
+	{
+		new GraphContextAction { Id = "details", Label = "View Details" },
+		new GraphContextAction { Id = "sep", Label = "", IsSeparator = true },
+		new GraphContextAction { Id = "expand", Label = "Expand Subtree" },
+		new GraphContextAction { Id = "collapse", Label = "Collapse Subtree" }
+	};
+
+	private void HandleNodeSelected(GraphNode node)
+	{
+		selectedNode = node;
+		selectedNodeId = node.Id;
+		eventsFired.Add($"Node selected: {node.Label} ({node.Id})");
+	}
+
+	private void HandleContextAction(GraphContextAction action)
+	{
+		eventsFired.Add($"Context action: {action.Label} on {selectedNode?.Label ?? "none"}");
+	}
+
+	private void HandleWarning(string message)
+	{
+		warnings.Add(message);
+		eventsFired.Add($"Warning: {message}");
+	}
+
+	private void HandleSelectionCleared()
+	{
+		selectedNode = null;
+		selectedNodeId = null;
+		eventsFired.Add("Selection cleared");
+	}
+
+	private void LayoutModeChanged(ChangeEventArgs e)
+	{
+		if (Enum.TryParse<GraphLayoutMode>(e.Value?.ToString(), out var mode))
+		{
+			layoutMode = mode;
+		}
+	}
+
+	private void LoadHierarchy()
+	{
+		warnings.Clear();
+		graphData = new GraphData
+		{
+			Nodes = new List<GraphNode>
+			{
+				new GraphNode { Id = "1", Label = "CEO", Status = NodeStatus.Ok },
+				new GraphNode { Id = "2", Label = "CTO", Status = NodeStatus.Ok },
+				new GraphNode { Id = "3", Label = "CFO", Status = NodeStatus.Warning },
+				new GraphNode { Id = "4", Label = "VP Engineering", Status = NodeStatus.Ok },
+				new GraphNode { Id = "5", Label = "VP Finance", Status = NodeStatus.None },
+				new GraphNode { Id = "6", Label = "Lead Dev", Status = NodeStatus.Ok },
+				new GraphNode { Id = "7", Label = "Lead QA", Status = NodeStatus.Error },
+				new GraphNode { Id = "8", Label = "Accountant", Status = NodeStatus.None },
+				new GraphNode { Id = "9", Label = "Analyst", Status = NodeStatus.Unknown }
+			},
+			Edges = new List<GraphEdge>
+			{
+				new GraphEdge { Id = "e1", SourceNodeId = "1", TargetNodeId = "2" },
+				new GraphEdge { Id = "e2", SourceNodeId = "1", TargetNodeId = "3" },
+				new GraphEdge { Id = "e3", SourceNodeId = "2", TargetNodeId = "4" },
+				new GraphEdge { Id = "e4", SourceNodeId = "3", TargetNodeId = "5" },
+				new GraphEdge { Id = "e5", SourceNodeId = "4", TargetNodeId = "6" },
+				new GraphEdge { Id = "e6", SourceNodeId = "4", TargetNodeId = "7" },
+				new GraphEdge { Id = "e7", SourceNodeId = "5", TargetNodeId = "8" },
+				new GraphEdge { Id = "e8", SourceNodeId = "5", TargetNodeId = "9" }
+			}
+		};
+		eventsFired.Add("Loaded hierarchy dataset (9 nodes)");
+	}
+
+	private void LoadForest()
+	{
+		warnings.Clear();
+		graphData = new GraphData
+		{
+			Nodes = new List<GraphNode>
+			{
+				new GraphNode { Id = "t1-1", Label = "Team A Lead" },
+				new GraphNode { Id = "t1-2", Label = "Dev A1" },
+				new GraphNode { Id = "t1-3", Label = "Dev A2" },
+				new GraphNode { Id = "t2-1", Label = "Team B Lead" },
+				new GraphNode { Id = "t2-2", Label = "Dev B1" },
+				new GraphNode { Id = "t3-1", Label = "Team C Lead" },
+				new GraphNode { Id = "t3-2", Label = "Dev C1" },
+				new GraphNode { Id = "t3-3", Label = "Dev C2" }
+			},
+			Edges = new List<GraphEdge>
+			{
+				new GraphEdge { Id = "f1", SourceNodeId = "t1-1", TargetNodeId = "t1-2" },
+				new GraphEdge { Id = "f2", SourceNodeId = "t1-1", TargetNodeId = "t1-3" },
+				new GraphEdge { Id = "f3", SourceNodeId = "t2-1", TargetNodeId = "t2-2" },
+				new GraphEdge { Id = "f4", SourceNodeId = "t3-1", TargetNodeId = "t3-2" },
+				new GraphEdge { Id = "f5", SourceNodeId = "t3-1", TargetNodeId = "t3-3" }
+			}
+		};
+		eventsFired.Add("Loaded forest dataset (8 nodes, 3 trees)");
+	}
+
+	private void LoadDAG()
+	{
+		warnings.Clear();
+		graphData = new GraphData
+		{
+			Nodes = new List<GraphNode>
+			{
+				new GraphNode { Id = "d1", Label = "Shared Service" },
+				new GraphNode { Id = "d2", Label = "Consumer A" },
+				new GraphNode { Id = "d3", Label = "Consumer B" },
+				new GraphNode { Id = "d4", Label = "Backend" }
+			},
+			Edges = new List<GraphEdge>
+			{
+				new GraphEdge { Id = "de1", SourceNodeId = "d1", TargetNodeId = "d2" },
+				new GraphEdge { Id = "de2", SourceNodeId = "d1", TargetNodeId = "d3" },
+				new GraphEdge { Id = "de3", SourceNodeId = "d4", TargetNodeId = "d2" },
+				new GraphEdge { Id = "de4", SourceNodeId = "d4", TargetNodeId = "d3" }
+			}
+		};
+		eventsFired.Add("Loaded DAG dataset (4 nodes, multi-parent)");
+	}
+
+	private void LoadLarge()
+	{
+		warnings.Clear();
+		var nodes = new List<GraphNode>();
+		var edges = new List<GraphEdge>();
+
+		nodes.Add(new GraphNode { Id = "root", Label = "Root" });
+		for (int i = 1; i <= 600; i++)
+		{
+			nodes.Add(new GraphNode
+			{
+				Id = $"n{i}",
+				Label = $"Node {i}",
+				Status = (NodeStatus)(i % 5)
+			});
+			var parentId = i <= 10 ? "root" : $"n{i / 10}";
+			edges.Add(new GraphEdge
+			{
+				Id = $"le{i}",
+				SourceNodeId = parentId,
+				TargetNodeId = $"n{i}"
+			});
+		}
+
+		graphData = new GraphData { Nodes = nodes, Edges = edges };
+		eventsFired.Add("Loaded large dataset (601 nodes, performance mode)");
+	}
+
+	private void Clear()
+	{
+		graphData = null;
+		selectedNode = null;
+		selectedNodeId = null;
+		warnings.Clear();
+		eventsFired.Add("Cleared graph data");
+	}
+
+	private void ToggleLoading()
+	{
+		isLoading = !isLoading;
+		eventsFired.Add($"Loading: {isLoading}");
+	}
+
+	private async Task ResetView()
+	{
+		if (graphView != null)
+		{
+			await graphView.ResetView();
+		}
+		eventsFired.Add("Reset view");
+	}
+
+	private async Task ExpandAll()
+	{
+		if (graphView != null)
+		{
+			await graphView.ExpandAll();
+		}
+		eventsFired.Add("Expand all");
+	}
+}
